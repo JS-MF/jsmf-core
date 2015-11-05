@@ -19,6 +19,60 @@ function AttributesModelCopy(SourceME, TargetME) {
 }
 
 
+function export3DGraph(m) {
+var mapId={};
+var graph = {};
+graph.nodes = [];
+graph.links = [];
+var idcount = 0;
+
+//That can be done with a transfo / syntax-template language
+_.each(m.modellingElements, function(elem,index) {
+    _.each(elem, function(elem2,index2){
+		 // convert number into string
+	var pushGraphNode = {};
+	   for(var i in elem2.conformsTo().__attributes) {
+        //check if elements are !== undefined
+           pushGraphNode['ConformsTo']=elem2.conformsTo().__name;
+            var j = elem2[i];
+            if(_.isNumber(j)){
+                j = new String(j);
+                pushGraphNode[i]=j;
+            } else {
+                pushGraphNode[i]=j;
+            }
+        }
+       var idHash = hash(elem2);
+       mapId[idHash]=idcount;
+       idcount++;
+	   graph.nodes.push(pushGraphNode);
+            
+	});
+});
+    //map all the 
+//Dumb link since the first one seems to be avoided
+var dumb = {name:'dumb', source:0, target:1};
+graph.links.push(dumb);
+_.each(m.modellingElements, function(elem,index) {
+    _.each(elem, function(elem2,index2){
+        var pushGraphLink={};
+        
+        for(var i in elem2.conformsTo().__references){
+            pushGraphLink.name=i;
+            var source = mapId[hash(elem2)];
+            _.each(elem2[i], function(elem3,index3) {
+                pushGraphLink.source=source;
+                var target = hash(elem2[i][index3]);
+                pushGraphLink.target = mapId[target];
+            });
+            graph.links.push(pushGraphLink);
+        }
+    });
+});
+return graph;
+
+}
+
 function ModelCopy(SourceME, TargetME) {
     _.each(SourceME.conformsTo().__attributes, function (element, index, list) {
         if (TargetME.hasOwnProperty(index)) {
@@ -167,5 +221,9 @@ module.exports = {
 
     equals: function (modelElementR, modelElementL) {
         return equals(modelElementR, modelElementL);
-    }
+    },
+
+	exportD3JS :function(model)  {
+		return export3DGraph(model);
+	}
 }; // end exports

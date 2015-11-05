@@ -2,6 +2,7 @@ var JSMF = require('./jsmf');
 var Model = JSMF.Model;
 var Class = JSMF.Class;
 var _ = require('lodash');
+var hash = require('object-hash');
 
 
 //Copy the element which are the same from sourceME to targetME without changing the metaclass of Source and Target elements

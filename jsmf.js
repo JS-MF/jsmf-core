@@ -111,10 +111,6 @@ Model.prototype.save = function () {
     this.modelDB.saveModel(this);
 }
 
-Model.prototype.load = function (callback) {
-    this.modelDB.loadModel(this, callback);
-}
-
 //M2
 function Class(name) {
     this.__name = name;

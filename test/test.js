@@ -702,6 +702,33 @@ describe('Create Class Instances', function() {
 			done();
 		})
         
+        it('We can add several references at the same time', function(done){
+            State = Class.newInstance('State');
+            Transition = Class.newInstance('Transition');
+            Transition.setAttribute('name', String);
+            State.setReference('transition', Transition, -1);
+
+            s1 = State.newInstance('s1');
+            s1.should.have.property('setTransition');
+            s1.conformsTo().__references['transition'].type.should.equal(Transition);
+            s1.transition.should.be.empty;
+
+            t1 = Transition.newInstance('t1');
+            t1.setName('transitionOne');
+
+            t2 = Transition.newInstance('t1'); //keeping the same name ...
+            t2.setName('transitionOne'); //... and the same attributes
+
+            s1.setTransition([t1,t2]);
+            s1.transition.should.not.be.empty;
+            s1.should.have.property('transition',[t1,t2]);
+            s1.transition[0].should.equal(t1);
+            s1.transition[1].should.equal(t2);
+            s1.transition.length.should.equal(2); // the object has not been set two times
+
+			done();
+        });
+
          it('Instance Created with circular (non-opposite) References', function(done){
 			var State = Class.newInstance('State');
 			var Transition = Class.newInstance('Transition');
@@ -736,8 +763,8 @@ describe('Create Class Instances', function() {
          
          //Opposite!
          it('Instance Created with simple opposite relations', function(done){
-			var State = Class.newInstance('State');
-			var Transition = Class.newInstance('Transition');
+            State = Class.newInstance('State');
+            Transition = Class.newInstance('Transition');
             State.setReference('transition', Transition, -1, 'source');
             Transition.setReference('source', State, 1, 'transition'); //'transition'
              
@@ -773,6 +800,28 @@ describe('Create Class Instances', function() {
 			done();
 		})
          
+         it('Opposite relations are not added if direct relation fails', function(done){
+            State = Class.newInstance('State');
+            Transition = Class.newInstance('Transition');
+            State.setReference('transition', Transition, -1, 'source');
+            Transition.setReference('source', State, 1, 'transition'); //'transition'
+             
+            State.__references['transition'].opposite.should.equal('source');
+            Transition.__references['source'].opposite.should.equal('transition');
+
+            s1 = State.newInstance('s1');
+            s1.transition.should.be.empty;
+            
+            s2 = State.newInstance('s2');
+            s1.setTransition(s2);
+        
+            s1.transition.should.be.empty;
+            s2.transition.should.be.empty;
+
+            done();
+         })
+
+
          it('Instances created with simple inherited Reference', function(done){
 			var State = Class.newInstance('State');
             var Transition = Class.newInstance('Transition');

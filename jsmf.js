@@ -18,9 +18,9 @@ function Model(name, db) {
     this.__name = name;
     this.referenceModel = {}; //set the metamodel of this
     this.modellingElements = {};
-	if(db!==undefined) {
-		this.modelDB=db;
-	}
+    if(db!==undefined) {
+        this.modelDB=db;
+    }
 }
 
 //WARNING CHECK if classs is defined
@@ -31,9 +31,9 @@ Model.prototype.setModellingElement = function (Class) {
         if (tab == undefined) {
             tab = [];
         }
-        
+
         tab.push(Class);
-       // console.log('ConformsTo : ', Class.conformsTo().__name); 
+       // console.log('ConformsTo : ', Class.conformsTo().__name);
         this.modellingElements[Class.conformsTo().__name] = tab;
     } else {
         if (tab == undefined) {
@@ -41,7 +41,7 @@ Model.prototype.setModellingElement = function (Class) {
         }
         tab.push(Class);
         this.modellingElements[Class.__name] = tab;
-       
+
     }
 };
 
@@ -51,7 +51,7 @@ Model.prototype.setModellingElements = function (ClassTab) {
         for (i in ClassTab) {
             if (ClassTab[i].__name == undefined) { //i.e. not  a meta-element
                 var tab = [];
-     
+
                 tab = this.modellingElements[ClassTab[i].conformsTo().__name];
                 if (tab == undefined) {
                     tab = [];
@@ -73,7 +73,7 @@ Model.prototype.add = function (ClassTab) {
         for (i in ClassTab) {
             if (ClassTab[i].__name == undefined) { //i.e. not  a meta-element
                 var tab = [];
-     
+
                 tab = this.modellingElements[ClassTab[i].conformsTo().__name];
                 if (tab == undefined) {
                     tab = [];
@@ -93,14 +93,14 @@ Model.prototype.add = function (ClassTab) {
 //Send to JSMF Util?
 Model.prototype.contains = function (ModelElement) {
     var indexM = ModelElement.conformsTo().__name;
-    var result = _.contains(this.modellingElements[indexM], ModelElement);
+    var result = _.includes(this.modellingElements[indexM], ModelElement);
     return result;
 }
 
 
 Model.prototype.Filter = function(Classifier) {
- return this.modellingElements[Classifier.__name] ;  
-    
+ return this.modellingElements[Classifier.__name] ;
+
 }
 
 Model.prototype.setReferenceModel = function (metamodel) {
@@ -124,19 +124,19 @@ function Class(name) {
     this.__superType = {};
 }
 
-Class.newInstance = function (classname){ 
-	var Obj = new Class(classname);  //here check promote/demote functions
-	return Obj; 
+Class.newInstance = function (classname){
+    var Obj = new Class(classname);  //here check promote/demote functions
+    return Obj;
 };
 
 //Class conformsTo itself (metacircularity)
 Class.conformsTo = function() {
-	return Class; 
+    return Class;
 
 };
 
 Class.prototype.setAttribute = function (name, type) {
-    if (_.contains(this.__attributes, name)) {} else {
+    if (_.includes(this.__attributes, name)) {} else {
         this.__attributes[name] = type;
     }
 };
@@ -151,8 +151,8 @@ Class.prototype.getInheritanceChain = function(result) {
         return result;
     } else {
         for(i in this.__superType) {
-			result.push(this.__superType[i]);	
-		}		
+            result.push(this.__superType[i]);
+        }
         return this.__superType[i].getInheritanceChain(result);
     }
 }
@@ -165,29 +165,29 @@ Class.prototype.getAllReferences = function() {
     });
     var allsuperTypes = this.getInheritanceChain([]);
     for(var i in allsuperTypes) {
-		refSuperType = allsuperTypes[i];
+        refSuperType = allsuperTypes[i];
         _.forEach(refSuperType.__references, function(elem, index) {
             result[index]=elem;
         });
-	}
-    return result;  
+    }
+    return result;
 }
 
 Class.prototype.getAllAttributes = function() {
     var result=[];
-   
+
     result.push(this.__attributes)
     var allsuperTypes = this.getInheritanceChain([]);
     for(var i in allsuperTypes) {
-		refSuperType = allsuperTypes[i];
+        refSuperType = allsuperTypes[i];
         result.push(refSuperType.__attributes);
-	}
-    return result;  
+    }
+    return result;
 }
 
 //Instance of MetaClass is conforms to Class.
 Class.prototype.conformsTo = function () {
-    return Class; 
+    return Class;
 };
 
 
@@ -206,7 +206,7 @@ Class.prototype.setReference = function (name, type, cardinality, opposite, comp
          var tmp = this.__references[name];
         tmp.composite = composite;
     }
-    
+
 };
 
 /******************************
@@ -221,7 +221,7 @@ function Enum(name) {
 Enum.prototype.conformsTo = function() {return Enum;}
 
 Enum.prototype.setLiteral = function(name, value) {
-     if (_.contains(this.__literals, name)) {} else {
+     if (_.includes(this.__literals, name)) {} else {
         this.__literals[name]=value;
      }
 };
@@ -237,17 +237,17 @@ function makeAssignation(ob, index, attype) {
     //if attype = primitive JS type else ...
     var type = new attype;
     return function (param) {
-        if (param.__proto__ == type.__proto__) { 
+        if (param.__proto__ == type.__proto__) {
             ob[index] = param;
         } else {
-			throw new Error("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
+            throw new Error("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
             //console.log("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
         }
     };
 }
 
 // Adding the creation of opposite except for ARRAY of Type
-function makeReference(ob, index, type, card, opposite, composite,associated) { 
+function makeReference(ob, index, type, card, opposite, composite,associated) {
     ob.associated=[];
     return function assign(param,associated) {
         //CheckCardinalitie
@@ -259,18 +259,18 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
         } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
             ob[index].push(param);
             ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
-        } else if (type instanceof Array) { //Checking all the element type in array 
-            if (_.contains(type, param.conformsTo())) {
+        } else if (type instanceof Array) { //Checking all the element type in array
+            if (_.includes(type, param.conformsTo())) {
                  ob[index].push(param);
                  ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
             } else {
                  console.log("assigning wrong type: " + param.conformsTo().__name + " Expecting types in " + type);
             }
-         } else if (type == param.conformsTo() || _.contains(type,param.conformsTo().getInheritanceChain([]))) {
-             //|| _.contains(type, param.getInheritanceChain([])) //WARNING : Debugging Inheritance issue by Ava
+         } else if (type == param.conformsTo() || _.includes(type,param.conformsTo().getInheritanceChain([]))) {
+             //|| _.includes(type, param.getInheritanceChain([])) //WARNING : Debugging Inheritance issue by Ava
                         //Check if the object is not already in reference collection<?
-             if(_.contains(ob[index],param)) {
-                 console.log("Error trying to assign already assigned object of relation "+ index);   
+             if(_.includes(ob[index],param)) {
+                 console.log("Error trying to assign already assigned object of relation "+ index);
                  //maybe assigning it because of circular opposite relation
              } else {
                  ob[index].push(param); //ob[index]=param...
@@ -282,32 +282,32 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
                  }
              }
         } else {
-             console.log(_.contains(param.conformsTo().getInheritanceChain([])),type);
+             console.log(_.includes(param.conformsTo().getInheritanceChain([])),type);
              console.log(param.conformsTo().getInheritanceChain([])[0])
-             //ob[index].push(param); //WARNING DO the push if type 
+             //ob[index].push(param); //WARNING DO the push if type
              console.log("assigning wrong type: " + param.conformsTo().__name + " to current reference." + " Type " + type.__name + " was expected");
         }
     };
 }
 
 Class.prototype.newInstance = function (name) {
-    var result = {}; 
+    var result = {};
     var self = this;
     var setterName = function (s) {
       return 'set' + s[0].toUpperCase() + s.slice(1);
     }
-	
+
     //Get all the super types of the current instance
     var allsuperType = this.getInheritanceChain([]);
-    
+
     //create setter for attributes from superclass
-	for(var i in allsuperType) {
-		refSuperType = allsuperType[i];
+    for(var i in allsuperType) {
+        refSuperType = allsuperType[i];
         for (var sup in refSuperType.__attributes) {
-         	result[sup] = new refSuperType.__attributes[sup]();
+             result[sup] = new refSuperType.__attributes[sup]();
             var attype = refSuperType.__attributes[sup];
             result[setterName(sup)] = makeAssignation(result, sup, attype);
-       	}
+           }
         //do the same for references
         for (var sup in refSuperType.__references) {
             result[sup] = [];
@@ -318,7 +318,7 @@ Class.prototype.newInstance = function (name) {
             var associated = refSuperType.__references[sup].associated;
             result[setterName(sup)] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
         }
-	}
+    }
 
     //create setter for attributes (super attributes will be overwritten if they have the same name)
     for (var i in this.__attributes) {
@@ -356,7 +356,7 @@ module.exports = {
     Class: Class,
 
     Model: Model,
-    
+
     Enum : Enum
 
 };

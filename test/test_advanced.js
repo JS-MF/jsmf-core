@@ -29,17 +29,17 @@ describe('Create Dynamic Instances', function() {
                 tabOfInstance[Type.__name]=Type.newInstance();
             }
             
-            tabOfInstance['Transition'].should.have.property('setactive');
-            tabOfInstance['Property'].should.have.property('setblink');
+            tabOfInstance['Transition'].should.have.property('setActive');
+            tabOfInstance['Property'].should.have.property('setBlink');
             var t1 = tabOfInstance['Transition'];
             var p1 = tabOfInstance['Property'];
-            t1.should.have.property('setactive');
+            t1.should.have.property('setActive');
             t1.active.should.be.empty;
-            t1.setactive(true);
+            t1.setActive(true);
             t1.should.have.property('active',true);
             
             p1.blink.should.be.empty;
-            p1.setblink(182);
+            p1.setBlink(182);
             p1.should.have.property('blink',182);
 			
 			done();
@@ -70,11 +70,11 @@ describe('Create Dynamic Instances', function() {
                 tabOfInstance[Type.__name]=Type.newInstance();
             }
             
-            tabOfInstance['Transition'].should.have.property('setactive');
+            tabOfInstance['Transition'].should.have.property('setActive');
             var t1 = tabOfInstance['Transition'];
-            t1.should.have.property('setactive');
+            t1.should.have.property('setActive');
             t1.active.should.be.empty;
-            t1.setactive(true);
+            t1.setActive(true);
             t1.should.have.property('active',true);
             
 

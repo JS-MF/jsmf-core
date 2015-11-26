@@ -275,7 +275,6 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
                         } else {
                             ob[index].push(param); //ob[index]=param...
                             if(opposite!=undefined) {
-                                //var functionStr = 'set'+opposite;
                                 param[opposite].push(ob);
                                 //param[functionStr](ob); // using object function but consequently it is trying to push 2 times but have all the checks...
                                 //even for inheritance?
@@ -296,6 +295,9 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
 Class.prototype.newInstance = function (name) {
     var result = {}; 
     var self = this;
+    var setterName = function (s) {
+      return 'set' + s[0].toUpperCase() + s.slice(1);
+    }
 	
     //Get all the super types of the current instance
     var allsuperType = this.getInheritanceChain([]);
@@ -306,7 +308,7 @@ Class.prototype.newInstance = function (name) {
         for (var sup in refSuperType.__attributes) {
          	result[sup] = new refSuperType.__attributes[sup]();
             var attype = refSuperType.__attributes[sup];
-            result["set" + sup] = makeAssignation(result, sup, attype);
+            result[setterName(sup)] = makeAssignation(result, sup, attype);
        	}
         //do the same for references
         for (var sup in refSuperType.__references) {
@@ -316,7 +318,7 @@ Class.prototype.newInstance = function (name) {
             var opposite = refSuperType.__references[sup].opposite;
             var composite = refSuperType.__references[sup].composite;
             var associated = refSuperType.__references[sup].associated;
-            result["set" + sup] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
+            result[setterName(sup)] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
         }
 	}
 
@@ -328,7 +330,7 @@ Class.prototype.newInstance = function (name) {
         } else {
             console.log(this.__attributes[i]); //TODO: add behavior for jsmf class instance
         }
-        result["set" + i] = makeAssignation(result, i, attype);
+        result[setterName(i)] = makeAssignation(result, i, attype);
     }
 
     //create setter for references (super references will be overwritten if they have the same name)
@@ -339,7 +341,7 @@ Class.prototype.newInstance = function (name) {
         var opposite = this.__references[j].opposite;
         var composite = this.__references[j].composite;
         var associated = this.__references[j].associated;
-        result["set" + j] = makeReference(result, j, type, card, opposite, composite,associated); // TODO: add behavior for composite
+        result[setterName(j)] = makeReference(result, j, type, card, opposite, composite,associated); // TODO: add behavior for composite
     }
 
     // Assign the "type" to which M1 class is conform to.

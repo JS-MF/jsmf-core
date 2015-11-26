@@ -206,17 +206,17 @@ describe('Create Class Instances', function() {
 			s1.should.have.property('id');
 
 			//attributes values have been set
-			s1.should.have.property('setname');
-			s1.should.have.property('setid');
-			s1.setname('s1');
-			s1.setid(12);
+			s1.should.have.property('setName');
+			s1.should.have.property('setId');
+			s1.setName('s1');
+			s1.setId(12);
 			s1.should.have.property('name','s1');
 			s1.should.have.property('id',12);
 			s1.should.not.have.property('id','12');
 			s1.should.not.have.property('name',s1);
 			
 			//Rewritting values
-			s1.setname('news1');
+			s1.setName('news1');
 			s1.should.have.property('name','news1');
 			s1.should.not.have.property('name','s1');			
 
@@ -244,19 +244,19 @@ describe('Create Class Instances', function() {
 			s1.should.have.property('id');
 
 			//attributes values have been set
-			s1.should.have.property('setname');
-			s1.should.have.property('setid');
-			s1.setname('s1');
+			s1.should.have.property('setName');
+			s1.should.have.property('setId');
+			s1.setName('s1');
 
 			//set the overriden attributes (id), with the overidden type
-			s1.setid(12);
+			s1.setId(12);
 			s1.should.have.property('name','s1');
 			s1.should.have.property('id',12);
 			s1.should.not.have.property('name',s1);
 				
 			// set inherited values
-			s1.should.have.property('setactive');
-			s1.setactive(true);
+			s1.should.have.property('setActive');
+			s1.setActive(true);
 			s1.should.have.property('active',true);
 			done();
 		})
@@ -282,16 +282,16 @@ describe('Create Class Instances', function() {
 			s1.should.have.property('id');
 
 			//attributes values have been set
-			s1.should.have.property('setname');
-			s1.should.have.property('setid');
-			s1.should.have.property('setactive');
-			s1.setname('s1');
+			s1.should.have.property('setName');
+			s1.should.have.property('setId');
+			s1.should.have.property('setActive');
+			s1.setName('s1');
 			//set active			
-			s1.setactive(true);
+			s1.setActive(true);
 			s1.should.have.property('active',true);
 
 			//set the overriden attributes (id), with the overidden type
-			s1.setid(12);
+			s1.setId(12);
 			s1.should.have.property('name','s1');
 			s1.should.have.property('id',12);
 			s1.should.not.have.property('name',s1);
@@ -299,7 +299,7 @@ describe('Create Class Instances', function() {
 			//update the id with incorrect type (with inherented but overriden type)
 			var exception=false;			
 			try {
-				s1.setid('12');
+				s1.setId('12');
 			} catch(e) {
 				exception=true;
 			}
@@ -308,7 +308,7 @@ describe('Create Class Instances', function() {
 			s1.should.have.property('id',12);
 
 			//update this id with a correct type
-			s1.setid(13);
+			s1.setId(13);
 			s1.should.not.have.property('id',12);
 			s1.should.have.property('id',13);			
 
@@ -342,26 +342,26 @@ describe('Create Class Instances', function() {
 			s1.should.have.property('id');
 
 			//attributes values have been set
-			s1.should.have.property('setname');
-			s1.should.have.property('setid');
+			s1.should.have.property('setName');
+			s1.should.have.property('setId');
             s1.id.should.be.empty; 
             s1.name.should.be.empty; 
             
-			s1.setname('s1');
-			s1.setid(12);
+			s1.setName('s1');
+			s1.setId(12);
 			s1.should.have.property('name','s1');
 			s1.should.have.property('id',12);
 			s1.should.not.have.property('id','12');
 			s1.should.not.have.property('name',s1);
 			
 			// set inherited values from first class
-			s1.should.have.property('setactive');
-			s1.setactive(true);
+			s1.should.have.property('setActive');
+			s1.setActive(true);
 			s1.should.have.property('active',true);
 
 			//set inherited value from second class
-			s1.should.have.property('setisnew');
-			s1.setisnew(false);			
+			s1.should.have.property('setIsnew');
+			s1.setIsnew(false);			
 			s1.should.have.property('isnew',false);
 			
 			done();
@@ -382,11 +382,11 @@ describe('Create Class Instances', function() {
 			State.setSuperType(SuperState);								
 
 			s1 = State.newInstance('s1');
-			s1.setname('s1');
+			s1.setName('s1');
             s1.should.have.property('name','s1');
-			s1.setid(12);
+			s1.setId(12);
             s1.should.have.property('id',12);
-			s1.setblink(182);
+			s1.setBlink(182);
 			s1.should.have.property('blink',182);
 			done();
 		})
@@ -406,16 +406,16 @@ describe('Create Class Instances', function() {
 			SuperState.setSuperType(SuperSuperState);
 			
 			s1 = State.newInstance('s1');
-			s1.should.have.property('setid');
+			s1.should.have.property('setId');
             s1.id.should.be.empty;    
             
-			s1.setid(12);
+			s1.setId(12);
 			s1.should.have.property('id',12);
 
 			//incorrect assignation: type of SuperState
 			var exception=false;
 			try {
-				s1.setid('12');
+				s1.setId('12');
 			} catch(e) {
 				exception=true;
 			}
@@ -425,7 +425,7 @@ describe('Create Class Instances', function() {
 			//incorrect assignation: type of SuperSuperState
 			exception=false;
 			try {
-				s1.setid(true);
+				s1.setId(true);
 			} catch(e) {
 				exception=true;
 			}
@@ -440,14 +440,14 @@ describe('Create Class Instances', function() {
             s2.conformsTo().should.not.equal(State);
             
             s2.should.have.property('id');
-            s2.should.have.property('setid');
-            s2.setid('12');
+            s2.should.have.property('setId');
+            s2.setId('12');
             s2.should.have.property('id','12');
             s2.should.not.have.property('id',12);
 
             exception=false;
 			try {
-				s2.setid(12);
+				s2.setId(12);
 			} catch(e) {
 				exception=true;
 			}
@@ -457,7 +457,7 @@ describe('Create Class Instances', function() {
             
  			exception=false;
 			try {
-				 s2.setid(false);
+				 s2.setId(false);
 			} catch(e) {
 				exception=true;
 			}
@@ -471,8 +471,8 @@ describe('Create Class Instances', function() {
             s3.conformsTo().should.not.equal(State);
             
             s3.should.have.property('id');
-            s3.should.have.property('setid');
-            s3.setid(true);
+            s3.should.have.property('setId');
+            s3.setId(true);
             
             s3.should.have.property('id',true);
             s3.should.not.have.property('id',false);
@@ -502,16 +502,16 @@ describe('Create Class Instances', function() {
 			//attributes have been set
 			s1.should.have.property('id');
             s1.should.have.property('name');
-            s1.should.have.property('setid');
-            s1.should.have.property('setname');
+            s1.should.have.property('setId');
+            s1.should.have.property('setName');
 	        s1.name.should.be.empty;
-            s1.setid(false);
+            s1.setId(false);
             s1.should.have.property('id',false);
             
             //cannot assign the value for first type (super state) 
 			exception=false;
 			try {
-				s1.setid('12');
+				s1.setId('12');
 			} catch(e) {
 				exception=true;
 			}
@@ -531,7 +531,7 @@ describe('Create Class Instances', function() {
             
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
             
@@ -539,7 +539,7 @@ describe('Create Class Instances', function() {
             t1 = Transition.newInstance('t1');
             t1.conformsTo().should.equal(Transition);
             
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
@@ -554,19 +554,19 @@ describe('Create Class Instances', function() {
             State.setReference('transition', Transition, 1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
             
             t1 = Transition.newInstance('t1');
             t2 = Transition.newInstance('t2');
             
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             
-            s1.settransition(t2);
+            s1.setTransition(t2);
             s1.should.have.property('transition',[t1]);
             s1.should.not.have.property('transition',[t1,t2]);
             
@@ -579,7 +579,7 @@ describe('Create Class Instances', function() {
             State.setReference('transition', Transition, -1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
             
@@ -587,17 +587,17 @@ describe('Create Class Instances', function() {
             t2 = Transition.newInstance('t2');
             t3 = Transition.newInstance('t3');
              
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             
-            s1.settransition(t2);
+            s1.setTransition(t2);
             s1.should.not.have.property('transition',[t1]);
             s1.should.have.property('transition',[t1,t2]);
             s1.transition[1].should.equal(t2); 
             
-            s1.settransition(t3);
+            s1.setTransition(t3);
             s1.should.not.have.property('transition',[t1]);
             s1.should.have.property('transition',[t1,t2,t3]);
             s1.transition[2].should.equal(t3); 
@@ -612,7 +612,7 @@ describe('Create Class Instances', function() {
             State.setReference('transition', Transition, -1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
             
@@ -621,20 +621,20 @@ describe('Create Class Instances', function() {
             t2 = FalseTransition.newInstance('falset2');
             t3 = FalseTransition.newInstance('falset3');
              
-            s1.settransition(t0); 
+            s1.setTransition(t0); 
             s1.transition.should.be.empty;
             s1.should.not.have.property('transition',[t0]); 
               
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             
-            s1.settransition(t2);
+            s1.setTransition(t2);
             s1.should.have.property('transition',[t1]);
             s1.should.not.have.property('transition',[t1,t2]);
             
-            s1.settransition(t3);
+            s1.setTransition(t3);
             s1.should.have.property('transition',[t1]);
             s1.should.not.have.property('transition',[t1,t2,t3]);
              
@@ -648,21 +648,21 @@ describe('Create Class Instances', function() {
             State.setReference('transition', Transition, -1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
              
             t1 = Transition.newInstance('t1');
-            t1.setname('transitionOne');
+            t1.setName('transitionOne');
                 
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             s1.transition.length.should.equal(1);
             
             //Setting again t1 and checking that nothing has changed for s1.transition
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             s1.transition.length.should.equal(1); // the object has not been set two times
@@ -677,23 +677,23 @@ describe('Create Class Instances', function() {
             State.setReference('transition', Transition, -1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
              
             t1 = Transition.newInstance('t1');
-            t1.setname('transitionOne');
+            t1.setName('transitionOne');
             
             t2 = Transition.newInstance('t1'); //keeping the same name ...
-            t2.setname('transitionOne'); //... and the same attributes
+            t2.setName('transitionOne'); //... and the same attributes
         
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             s1.transition.length.should.equal(1);
             
-            s1.settransition(t2);
+            s1.setTransition(t2);
             s1.should.have.property('transition',[t1,t2]);
             s1.transition[0].should.equal(t1);
             s1.transition[1].should.equal(t2);
@@ -709,23 +709,23 @@ describe('Create Class Instances', function() {
             Transition.setReference('source', State, 1);
             
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references.should.have.keys('transition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.transition.should.be.empty;
             
             t1 = Transition.newInstance('t1');
-            t1.should.have.property('setsource');
+            t1.should.have.property('setSource');
             t1.conformsTo().__references['source'].type.should.equal(State);
             //(t1.transition === undefined).should.be.true;
             t1.source.should.be.empty
           
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
              
-            t1.setsource(s1);
+            t1.setSource(s1);
             t1.source.should.not.be.empty;
             t1.should.have.property('source',[s1]);
             t1.source[0].should.equal(s1);
@@ -746,26 +746,25 @@ describe('Create Class Instances', function() {
             Transition.__references['source'].opposite.should.equal('transition');
              
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references.should.have.keys('transition');
             s1.conformsTo().__references['transition'].type.should.equal(Transition);
             s1.conformsTo().__references['transition'].opposite.should.equal('source');
             s1.transition.should.be.empty;
             
             t1 = Transition.newInstance('t1');
-            t1.should.have.property('setsource');
+            t1.should.have.property('setSource');
             t1.conformsTo().__references['source'].type.should.equal(State);
             t1.conformsTo().__references['source'].opposite.should.equal('transition');
             (t1.transition === undefined).should.be.true;
             t1.source.should.be.empty
           
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.transition.should.not.be.empty;
             s1.should.have.property('transition',[t1]);
             s1.transition[0].should.equal(t1);
             s1.transition.length.should.equal(1); //no more in case of multiple opposite assignations
              
-           // t1.setsource(s1);
             t1.source.should.not.be.empty;
             t1.should.have.property('source',[s1]);
             t1.source[0].should.equal(s1);
@@ -788,8 +787,8 @@ describe('Create Class Instances', function() {
             Transition.setSuperType(SuperTransition);
              
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
-            s1.should.have.property('setsupertransition');
+            s1.should.have.property('setTransition');
+            s1.should.have.property('setSupertransition');
             s1.conformsTo().__references.should.have.keys('transition');
             s1.conformsTo().__superType.should.have.keys('SuperState');
             s1.conformsTo().__superType['SuperState'].__references.should.have.keys('supertransition');
@@ -800,8 +799,8 @@ describe('Create Class Instances', function() {
             t1 = Transition.newInstance('t1');
             st1 = SuperTransition.newInstance('st1');
              
-            s1.settransition(t1);
-            s1.setsupertransition(st1);
+            s1.setTransition(t1);
+            s1.setSupertransition(st1);
             s1.should.have.property('transition',[t1]);
             s1.should.have.property('supertransition',[st1]); 
              
@@ -823,7 +822,7 @@ describe('Create Class Instances', function() {
             Transition.setSuperType(SuperTransition);
              
             s1 = State.newInstance('s1');
-            s1.should.have.property('settransition');
+            s1.should.have.property('setTransition');
             s1.conformsTo().__references.should.have.keys('transition');
             s1.conformsTo().__superType.should.have.keys('SuperState');
             s1.conformsTo().__superType['SuperState'].__references.should.have.keys('transition');
@@ -833,11 +832,11 @@ describe('Create Class Instances', function() {
             t1 = Transition.newInstance('t1');
             st1 = SuperTransition.newInstance('st1');
              
-            s1.settransition(t1);
+            s1.setTransition(t1);
             s1.should.have.property('transition',[t1]);
             
             //That should not work (inherited references) => but it may work with relaxed JSMF (cumulative types).
-            s1.settransition(st1);
+            s1.setTransition(st1);
             //console.log(s1.transition.conformsTo());
             s1.should.have.property('transition',[st1]); 
              
@@ -858,11 +857,7 @@ describe('Create Class Instances', function() {
             t1 =  Transition.newInstance('t1');
             sub = SubState.newInstance('sub');
             
-            t1.setstates(sub);
-          //  t1.should.have.property('states',[sub]);
-            
-          //  t1.settransition(s1);
-          //  t1.should.have.property('states',[sub,s1])
+            t1.setStates(sub);
             
            done(); 
         });

@@ -160,13 +160,13 @@ Class.prototype.getInheritanceChain = function(result) {
 //
 Class.prototype.getAllReferences = function() {
     var result={};
-    _.each(this.__references, function(elem, index) {
+    _.forEach(this.__references, function(elem, index) {
         result[index]=elem;
     });
     var allsuperTypes = this.getInheritanceChain([]);
     for(var i in allsuperTypes) {
 		refSuperType = allsuperTypes[i];
-        _.each(refSuperType.__references, function(elem, index) {
+        _.forEach(refSuperType.__references, function(elem, index) {
             result[index]=elem;
         });
 	}
@@ -249,45 +249,41 @@ function makeAssignation(ob, index, attype) {
 // Adding the creation of opposite except for ARRAY of Type
 function makeReference(ob, index, type, card, opposite, composite,associated) { 
     ob.associated=[];
-    return function (param,associated) {
+    return function assign(param,associated) {
         //CheckCardinalitie
         var elementsinrelation = ob[index].length;
         ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
         if (card == 1 && elementsinrelation >= 1) {
             console.log("error trying to assign multiple elements to a single reference");
-        } else {
-            if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
-                ob[index].push(param);
+        } else if (param instanceof Array) {
+            _.forEach(param, function(p) {assign(p, associated)});
+        } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
+            ob[index].push(param);
+        } else if (type instanceof Array) { //Checking all the element type in array 
+            if (_.contains(type, param.conformsTo())) {
+                 ob[index].push(param);
             } else {
-                if (type instanceof Array) { //Checking all the element type in array 
-                    if (_.contains(type, param.conformsTo())) {
-                        ob[index].push(param);
-                    } else {
-                        console.log("assigning wrong type: " + param.conformsTo().__name + " Expecting types in " + type);
-                    }
-                } else {                    
-                    if (type == param.conformsTo() || _.contains(type,param.conformsTo().getInheritanceChain([]))) {
-                        //|| _.contains(type, param.getInheritanceChain([])) //WARNING : Debugging Inheritance issue by Ava
-                        //Check if the object is not already in reference collection<?
-                        if(_.contains(ob[index],param)) {
-                            console.log("Error trying to assign already assigned object of relation "+ index);   
-                            //maybe assigning it because of circular opposite relation
-                        } else {
-                            ob[index].push(param); //ob[index]=param...
-                            if(opposite!=undefined) {
-                                param[opposite].push(ob);
-                                //param[functionStr](ob); // using object function but consequently it is trying to push 2 times but have all the checks...
-                                //even for inheritance?
-                            }
-                        }
-                    } else {
-                        console.log(_.contains(param.conformsTo().getInheritanceChain([])),type);
-                        console.log(param.conformsTo().getInheritanceChain([])[0])
-                        //ob[index].push(param); //WARNING DO the push if type 
-                        console.log("assigning wrong type: " + param.conformsTo().__name + " to current reference." + " Type " + type.__name + " was expected");
-                    }
-                }
+                 console.log("assigning wrong type: " + param.conformsTo().__name + " Expecting types in " + type);
             }
+         } else if (type == param.conformsTo() || _.contains(type,param.conformsTo().getInheritanceChain([]))) {
+             //|| _.contains(type, param.getInheritanceChain([])) //WARNING : Debugging Inheritance issue by Ava
+                        //Check if the object is not already in reference collection<?
+             if(_.contains(ob[index],param)) {
+                 console.log("Error trying to assign already assigned object of relation "+ index);   
+                 //maybe assigning it because of circular opposite relation
+             } else {
+                 ob[index].push(param); //ob[index]=param...
+                 if(opposite!=undefined) {
+                      param[opposite].push(ob);
+                      //param[functionStr](ob); // using object function but consequently it is trying to push 2 times but have all the checks...
+                      //even for inheritance?
+                 }
+             }
+        } else {
+             console.log(_.contains(param.conformsTo().getInheritanceChain([])),type);
+             console.log(param.conformsTo().getInheritanceChain([])[0])
+             //ob[index].push(param); //WARNING DO the push if type 
+             console.log("assigning wrong type: " + param.conformsTo().__name + " to current reference." + " Type " + type.__name + " was expected");
         }
     };
 }

@@ -252,16 +252,17 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
     return function assign(param,associated) {
         //CheckCardinalitie
         var elementsinrelation = ob[index].length;
-        ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
         if (card == 1 && elementsinrelation >= 1) {
             console.log("error trying to assign multiple elements to a single reference");
         } else if (param instanceof Array) {
             _.forEach(param, function(p) {assign(p, associated)});
         } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
             ob[index].push(param);
+            ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
         } else if (type instanceof Array) { //Checking all the element type in array 
             if (_.contains(type, param.conformsTo())) {
                  ob[index].push(param);
+                 ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
             } else {
                  console.log("assigning wrong type: " + param.conformsTo().__name + " Expecting types in " + type);
             }
@@ -273,6 +274,7 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
                  //maybe assigning it because of circular opposite relation
              } else {
                  ob[index].push(param); //ob[index]=param...
+                 ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
                  if(opposite!=undefined) {
                       param[opposite].push(ob);
                       //param[functionStr](ob); // using object function but consequently it is trying to push 2 times but have all the checks...

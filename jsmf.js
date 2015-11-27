@@ -25,20 +25,12 @@ function Model(name, db) {
 
 //WARNING CHECK if classs is defined
 Model.prototype.setModellingElement = function (Class) {
-    var tab = [];
     if (Class.__name == undefined) {
-        tab = this.modellingElements[Class.conformsTo().__name];
-        if (tab == undefined) {
-            tab = [];
-        }
-
+        var tab = this.modellingElements[Class.conformsTo().__name] || [];
         tab.push(Class);
-       // console.log('ConformsTo : ', Class.conformsTo().__name);
         this.modellingElements[Class.conformsTo().__name] = tab;
     } else {
-        if (tab == undefined) {
-            tab = [];
-        }
+        var tab = [];
         tab.push(Class);
         this.modellingElements[Class.__name] = tab;
 
@@ -50,12 +42,7 @@ Model.prototype.setModellingElements = function (ClassTab) {
     if (ClassTab instanceof Array) {
         for (i in ClassTab) {
             if (ClassTab[i].__name == undefined) { //i.e. not  a meta-element
-                var tab = [];
-
-                tab = this.modellingElements[ClassTab[i].conformsTo().__name];
-                if (tab == undefined) {
-                    tab = [];
-                }
+                var tab = this.modellingElements[ClassTab[i].conformsTo().__name] || [];
                 tab.push(ClassTab[i]);
                 this.modellingElements[ClassTab[i].conformsTo().__name] = tab;
             } else {
@@ -69,25 +56,7 @@ Model.prototype.setModellingElements = function (ClassTab) {
 
 //Another way to put modelling elements in model.
 Model.prototype.add = function (ClassTab) {
-    if (ClassTab instanceof Array) {
-        for (i in ClassTab) {
-            if (ClassTab[i].__name == undefined) { //i.e. not  a meta-element
-                var tab = [];
-
-                tab = this.modellingElements[ClassTab[i].conformsTo().__name];
-                if (tab == undefined) {
-                    tab = [];
-                }
-                tab.push(ClassTab[i]);
-                this.modellingElements[ClassTab[i].conformsTo().__name] = tab;
-            } else {
-                this.modellingElements[ClassTab[i].__name] = ClassTab[i];
-            }
-        }
-    } else {
-        console.error("Unable to set one element use Model.setModellingElements calling setModellingElement with only one element.");
-        this.setModellingElement(ClassTab);
-    }
+    this.setModellingElements(ClassTab);
 }
 
 //Send to JSMF Util?
@@ -136,7 +105,7 @@ Class.conformsTo = function() {
 };
 
 Class.prototype.setAttribute = function (name, type) {
-    if (_.includes(this.__attributes, name)) {} else {
+    if (!(_.includes(this.__attributes, name))) {
         this.__attributes[name] = type;
     }
 };

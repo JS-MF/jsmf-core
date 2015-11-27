@@ -114,16 +114,20 @@ Class.prototype.setSuperType = function (Class) {
     this.__superType[Class.__name] = Class;
 }
 
-Class.prototype.getInheritanceChain = function(result) {
-
+Class.prototype.getInheritanceChain = function() {
     if (Object.getOwnPropertyNames(this.__superType).length == 0 || this.__superType == undefined) {
-        return result;
+        return [this];
     } else {
-        for(i in this.__superType) {
-            result.push(this.__superType[i]);
-        }
-        return this.__superType[i].getInheritanceChain(result);
+        return _.reduce(this.__superType,
+            function (all, next) { return all.concat(next.getInheritanceChain()); },
+            [this]);
     }
+}
+
+var hasClass = function (x, type) {
+    var types = type instanceof Array ? type : [type];
+    return _.some(x.conformsTo().getInheritanceChain(),
+                  function (c) {return _.includes(types, c)});
 }
 
 //
@@ -132,7 +136,7 @@ Class.prototype.getAllReferences = function() {
     _.forEach(this.__references, function(elem, index) {
         result[index]=elem;
     });
-    var allsuperTypes = this.getInheritanceChain([]);
+    var allsuperTypes = this.getInheritanceChain();
     for(var i in allsuperTypes) {
         refSuperType = allsuperTypes[i];
         _.forEach(refSuperType.__references, function(elem, index) {
@@ -146,7 +150,7 @@ Class.prototype.getAllAttributes = function() {
     var result=[];
 
     result.push(this.__attributes)
-    var allsuperTypes = this.getInheritanceChain([]);
+    var allsuperTypes = this.getInheritanceChain();
     for(var i in allsuperTypes) {
         refSuperType = allsuperTypes[i];
         result.push(refSuperType.__attributes);
@@ -221,6 +225,7 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
     return function assign(param,associated) {
         //CheckCardinalitie
         var elementsinrelation = ob[index].length;
+        var types = type instanceof Array ? type : [type];
         if (card == 1 && elementsinrelation >= 1) {
             console.log("error trying to assign multiple elements to a single reference");
         } else if (param instanceof Array) {
@@ -228,16 +233,7 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
         } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
             ob[index].push(param);
             ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
-        } else if (type instanceof Array) { //Checking all the element type in array
-            if (_.includes(type, param.conformsTo())) {
-                 ob[index].push(param);
-                 ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
-            } else {
-                 console.log("assigning wrong type: " + param.conformsTo().__name + " Expecting types in " + type);
-            }
-         } else if (type == param.conformsTo() || _.includes(type,param.conformsTo().getInheritanceChain([]))) {
-             //|| _.includes(type, param.getInheritanceChain([])) //WARNING : Debugging Inheritance issue by Ava
-                        //Check if the object is not already in reference collection<?
+        } else if (hasClass(param, types)) {
              if(_.includes(ob[index],param)) {
                  console.log("Error trying to assign already assigned object of relation "+ index);
                  //maybe assigning it because of circular opposite relation
@@ -251,8 +247,8 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
                  }
              }
         } else {
-             console.log(_.includes(param.conformsTo().getInheritanceChain([])),type);
-             console.log(param.conformsTo().getInheritanceChain([])[0])
+             console.log(_.includes(param.conformsTo().getInheritanceChain()),type);
+             console.log(param.conformsTo().getInheritanceChain()[0])
              //ob[index].push(param); //WARNING DO the push if type
              console.log("assigning wrong type: " + param.conformsTo().__name + " to current reference." + " Type " + type.__name + " was expected");
         }
@@ -267,7 +263,7 @@ Class.prototype.newInstance = function (name) {
     }
 
     //Get all the super types of the current instance
-    var allsuperType = this.getInheritanceChain([]);
+    var allsuperType = this.getInheritanceChain();
 
     //create setter for attributes from superclass
     for(var i in allsuperType) {

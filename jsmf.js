@@ -40,15 +40,15 @@ Model.prototype.setModellingElement = function (Class) {
 //
 Model.prototype.setModellingElements = function (ClassTab) {
     if (ClassTab instanceof Array) {
-        for (i in ClassTab) {
-            if (ClassTab[i].__name == undefined) { //i.e. not  a meta-element
+        _.forEach (ClassTab, function(ct) {
+            if (ct.__name == undefined) { //i.e. not  a meta-element
                 var tab = this.modellingElements[ClassTab[i].conformsTo().__name] || [];
-                tab.push(ClassTab[i]);
-                this.modellingElements[ClassTab[i].conformsTo().__name] = tab;
+                tab.push(ct);
+                this.modellingElements[ct.conformsTo().__name] = tab;
             } else {
-                this.modellingElements[ClassTab[i].__name] = ClassTab[i];
+                this.modellingElements[ct.__name] = ct;
             }
-        }
+        });
     } else {
         this.setModellingElement(ClassTab);
     }
@@ -119,8 +119,9 @@ Class.prototype.getInheritanceChain = function() {
         return [this];
     } else {
         return _.reduce(this.__superType,
-            function (all, next) { return all.concat(next.getInheritanceChain()); },
-            [this]);
+            function (result, next) { return result.concat(next.getInheritanceChain()); },
+            [this]
+            );
     }
 }
 
@@ -137,25 +138,19 @@ Class.prototype.getAllReferences = function() {
         result[index]=elem;
     });
     var allsuperTypes = this.getInheritanceChain();
-    for(var i in allsuperTypes) {
-        refSuperType = allsuperTypes[i];
+    _.forEach(allsuperTypes, function(refSuperType) {
         _.forEach(refSuperType.__references, function(elem, index) {
             result[index]=elem;
         });
-    }
+    });
     return result;
 }
 
 Class.prototype.getAllAttributes = function() {
-    var result=[];
-
-    result.push(this.__attributes)
-    var allsuperTypes = this.getInheritanceChain();
-    for(var i in allsuperTypes) {
-        refSuperType = allsuperTypes[i];
-        result.push(refSuperType.__attributes);
-    }
-    return result;
+    return _.reduce (this.getInheritanceChain(),
+        function(result, refSuperType) { result.push(refSuperType.__attributes); },
+        [this.__attribute]
+        );
 }
 
 //Instance of MetaClass is conforms to Class.
@@ -194,7 +189,9 @@ function Enum(name) {
 Enum.prototype.conformsTo = function() {return Enum;}
 
 Enum.prototype.setLiteral = function(name, value) {
-     if (_.includes(this.__literals, name)) {} else {
+     if (_.includes(this.__literals, name)) {
+        console.log("Try to set existing litteral " + name + " for Enum " + this);
+     } else {
         this.__literals[name]=value;
      }
 };
@@ -261,51 +258,40 @@ Class.prototype.newInstance = function (name) {
     var setterName = function (s) {
       return 'set' + s[0].toUpperCase() + s.slice(1);
     }
+    var createAttributesSetter = function (type) {
+        _.forEach (type.__attributes, function(attype, sup) {
+            if(attype.conformsTo== undefined) {
+                result[sup] = new attype(); //Work with JS primitve types only.
+            } else {
+                console.log(attype); //TODO: add behavior for jsmf class instance
+            }
+            result[setterName(sup)] = makeAssignation(result, sup, attype);
+        });
+    };
+    var createReferencesSetter = function (type) {
+        _.forEach (type.__references, function(ref, sup) {
+            result[sup] = [];
+            var type = ref.type;
+            var card = ref.card;
+            var opposite = ref.opposite;
+            var composite = ref.composite;
+            var associated = ref.associated;
+            result[setterName(sup)] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
+        });
+    }
 
     //Get all the super types of the current instance
     var allsuperType = this.getInheritanceChain();
 
     //create setter for attributes from superclass
-    for(var i in allsuperType) {
-        refSuperType = allsuperType[i];
-        for (var sup in refSuperType.__attributes) {
-             result[sup] = new refSuperType.__attributes[sup]();
-            var attype = refSuperType.__attributes[sup];
-            result[setterName(sup)] = makeAssignation(result, sup, attype);
-           }
-        //do the same for references
-        for (var sup in refSuperType.__references) {
-            result[sup] = [];
-            var type = refSuperType.__references[sup].type;
-            var card = refSuperType.__references[sup].card;
-            var opposite = refSuperType.__references[sup].opposite;
-            var composite = refSuperType.__references[sup].composite;
-            var associated = refSuperType.__references[sup].associated;
-            result[setterName(sup)] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
-        }
-    }
+    _.forEach(allsuperType, function (refSuperType) {
+        createAttributesSetter(refSuperType);
+        createReferencesSetter(refSuperType);
+    });
 
     //create setter for attributes (super attributes will be overwritten if they have the same name)
-    for (var i in this.__attributes) {
-        if(this.__attributes[i].conformsTo== undefined) {
-            result[i] = new this.__attributes[i](); //Work with JS primitve types only.
-            var attype = this.__attributes[i];
-        } else {
-            console.log(this.__attributes[i]); //TODO: add behavior for jsmf class instance
-        }
-        result[setterName(i)] = makeAssignation(result, i, attype);
-    }
-
-    //create setter for references (super references will be overwritten if they have the same name)
-    for (var j in this.__references) {
-        result[j] = [];
-        var type = this.__references[j].type;
-        var card = this.__references[j].card;
-        var opposite = this.__references[j].opposite;
-        var composite = this.__references[j].composite;
-        var associated = this.__references[j].associated;
-        result[setterName(j)] = makeReference(result, j, type, card, opposite, composite,associated); // TODO: add behavior for composite
-    }
+    createAttributesSetter(this);
+    createReferencesSetter(this);
 
     // Assign the "type" to which M1 class is conform to.
     result.conformsTo = function () {

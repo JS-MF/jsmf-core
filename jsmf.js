@@ -238,6 +238,7 @@ function makeReference(ob, index, type, card, opposite, composite,associated) {
                  ob[index].push(param); //ob[index]=param...
                  ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
                  if(opposite!=undefined) {
+                      if (param[opposite] == undefined) { param[opposite] = []; }
                       param[opposite].push(ob);
                       //param[functionStr](ob); // using object function but consequently it is trying to push 2 times but have all the checks...
                       //even for inheritance?

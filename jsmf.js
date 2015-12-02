@@ -39,18 +39,13 @@ Model.prototype.setModellingElement = function (Class) {
 
 //
 Model.prototype.setModellingElements = function (ClassTab) {
+    var self = this;
     if (ClassTab instanceof Array) {
         _.forEach (ClassTab, function(ct) {
-            if (ct.__name == undefined) { //i.e. not  a meta-element
-                var tab = this.modellingElements[ClassTab[i].conformsTo().__name] || [];
-                tab.push(ct);
-                this.modellingElements[ct.conformsTo().__name] = tab;
-            } else {
-                this.modellingElements[ct.__name] = ct;
-            }
+            self.setModellingElement(ct);
         });
     } else {
-        this.setModellingElement(ClassTab);
+        self.setModellingElement(ClassTab);
     }
 };
 
@@ -217,7 +212,7 @@ function makeAssignation(ob, index, attype) {
 }
 
 // Adding the creation of opposite except for ARRAY of Type
-function makeReference(ob, index, type, card, opposite, composite,associated) {
+function makeReference(ob, index, type, card, opposite, composite, associated) {
     ob.associated=[];
     return function assign(param,associated) {
         //CheckCardinalitie

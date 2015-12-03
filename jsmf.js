@@ -6,21 +6,17 @@
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Authors : J.S. Sottet, A Vagner
+Contributor : N. Biri
 */
 
-// if jsmf.set('db','neo4j') { load JSMFNeo4j.js module }; // how parameter it? ip address and port number?
-//var modelDB = require('./JSMFNeo4j.js'); // not direclty requiering Neo4J-JSMF
 var _ = require('lodash');
 
 //DEF: Check Type Strict, Partial, None | Check Cardinality Strict, Partial, None, ...
 //Natural => Formal
-function Model(name, db) {
+function Model(name) {
     this.__name = name;
     this.referenceModel = {}; //set the metamodel of this
     this.modellingElements = {};
-    if(db!==undefined) {
-        this.modelDB=db;
-    }
 }
 
 //WARNING CHECK if classs is defined
@@ -71,14 +67,6 @@ Model.prototype.setReferenceModel = function (metamodel) {
     this.referenceModel = metamodel;
 }
 
-
-Model.prototype.save = function () {
-    this.modelDB.saveModel(this);
-}
-
-Model.prototype.load = function (callback) {
-    this.modelDB.loadModel(this, callback);
-}
 
 //M2
 function Class(name) {

@@ -8,6 +8,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 Authors : J.S. Sottet, A Vagner
 Contributor : N. Biri
 */
+'use strict';
 
 var _ = require('lodash');
 
@@ -29,7 +30,6 @@ Model.prototype.setModellingElement = function (Class) {
         var tab = [];
         tab.push(Class);
         this.modellingElements[Class.__name] = tab;
-
     }
 };
 
@@ -102,7 +102,9 @@ Class.prototype.getInheritanceChain = function() {
         return [this];
     } else {
         return _.reduce(this.__superType,
-            function (result, next) { return result.concat(next.getInheritanceChain()); },
+            function (result, next) {
+                return result.concat(next.getInheritanceChain());
+            },
             [this]
             );
     }
@@ -131,7 +133,9 @@ Class.prototype.getAllReferences = function() {
 
 Class.prototype.getAllAttributes = function() {
     return _.reduce (this.getInheritanceChain(),
-        function(result, refSuperType) { result.push(refSuperType.__attributes); },
+        function(result, refSuperType) {
+            result.push(refSuperType.__attributes);
+        },
         [this.__attribute]
         );
 }
@@ -212,7 +216,11 @@ function makeReference(ob, index, type, card, opposite, composite, associated) {
             _.forEach(param, function(p) {assign(p, associated)});
         } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
             ob[index].push(param);
-            ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
+            ob.associated.push({
+                "ref":index,
+                "elem":elementsinrelation,
+                "associated":associated
+            });
         } else if (hasClass(param, types)) {
              if(_.includes(ob[index],param)) {
                  console.log("Error trying to assign already assigned object of relation "+ index);
@@ -236,7 +244,7 @@ function makeReference(ob, index, type, card, opposite, composite, associated) {
     };
 }
 
-Class.prototype.newInstance = function (name) {
+Class.prototype.newInstance = function (init) {
     var result = {};
     var self = this;
     var setterName = function (s) {
@@ -250,6 +258,9 @@ Class.prototype.newInstance = function (name) {
                 console.log(attype); //TODO: add behavior for jsmf class instance
             }
             result[setterName(sup)] = makeAssignation(result, sup, attype);
+            if (init instanceof Object && init[sup] != undefined) {
+              result[setterName(sup)](init[sup]);
+            }
         });
     };
     var createReferencesSetter = function (type) {
@@ -261,6 +272,9 @@ Class.prototype.newInstance = function (name) {
             var composite = ref.composite;
             var associated = ref.associated;
             result[setterName(sup)] = makeReference(result, sup, type, card, opposite, composite,associated); //TODO: composite specific behavior
+            if (init instanceof Object && init[sup] != undefined) {
+              result[setterName(sup)](init[sup]);
+            }
         });
     }
 

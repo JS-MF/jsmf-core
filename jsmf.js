@@ -69,15 +69,26 @@ Model.prototype.setReferenceModel = function (metamodel) {
 
 
 //M2
-function Class(name) {
+function Class(name, attributes, references) {
     this.__name = name;
     this.__attributes = {};
     this.__references = {};
     this.__superType = {};
+    _.forEach(attributes, function (type, name) {
+      Obj.setAttribute(name, type);
+    });
+    _.forEach(references, function (descriptor, name) {
+        var type = descriptor['type'];
+        var cardinality = descriptor['cardinality'];
+        var opposite = descriptor['opposite'];
+        var composite = descriptor['composite'];
+        var associated = descriptor['associated'];
+        Obj.setReference(name, type, cardinality, opposite, composite, associated);
+    });
 }
 
-Class.newInstance = function (classname){
-    var Obj = new Class(classname);  //here check promote/demote functions
+Class.newInstance = function (classname, attributes, references) {
+    var Obj = new Class(classname, attributes, references);  //here check promote/demote functions
     return Obj;
 };
 
@@ -119,9 +130,6 @@ var hasClass = function (x, type) {
 //
 Class.prototype.getAllReferences = function() {
     var result={};
-    _.forEach(this.__references, function(elem, index) {
-        result[index]=elem;
-    });
     var allsuperTypes = this.getInheritanceChain();
     _.forEach(allsuperTypes, function(refSuperType) {
         _.forEach(refSuperType.__references, function(elem, index) {

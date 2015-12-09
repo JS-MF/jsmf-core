@@ -74,8 +74,9 @@ function Class(name, attributes, references) {
     this.__attributes = {};
     this.__references = {};
     this.__superType = {};
+    var self = this;
     _.forEach(attributes, function (type, name) {
-      Obj.setAttribute(name, type);
+      self.setAttribute(name, type);
     });
     _.forEach(references, function (descriptor, name) {
         var type = descriptor['type'];
@@ -83,7 +84,7 @@ function Class(name, attributes, references) {
         var opposite = descriptor['opposite'];
         var composite = descriptor['composite'];
         var associated = descriptor['associated'];
-        Obj.setReference(name, type, cardinality, opposite, composite, associated);
+        self.setReference(name, type, cardinality, opposite, composite, associated);
     });
 }
 

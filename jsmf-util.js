@@ -20,7 +20,7 @@ function AttributesModelCopy(SourceME, TargetME) {
 }
 
 
-function export3DGraph(m) {
+function export3DGraph(model) {
 var mapId={};
 var graph = {};
 graph.nodes = [];
@@ -28,7 +28,7 @@ graph.links = [];
 var idcount = 0;
 
 //That can be done with a transfo / syntax-template language
-_.each(m.modellingElements, function(elem,index) {
+_.each(model.modellingElements, function(elem,index) {
     _.each(elem, function(elem2,index2){
 		 // convert number into string
 	var pushGraphNode = {};
@@ -46,15 +46,14 @@ _.each(m.modellingElements, function(elem,index) {
        var idHash = hash(elem2);
        mapId[idHash]=idcount;
        idcount++;
-	   graph.nodes.push(pushGraphNode);
-            
+	   graph.nodes.push(pushGraphNode);            
 	});
 });
     //map all the 
 //Dumb link since the first one seems to be avoided
-var dumb = {name:'dumb', source:0, target:1};
+var dumb = {name:'dumb', source:0, target:0};
 graph.links.push(dumb);
-_.each(m.modellingElements, function(elem,index) {
+_.each(model.modellingElements, function(elem,index) {
     _.each(elem, function(elem2,index2){
         var pushGraphLink={};
         
@@ -70,6 +69,7 @@ _.each(m.modellingElements, function(elem,index) {
         }
     });
 });
+
 return graph;
 
 }

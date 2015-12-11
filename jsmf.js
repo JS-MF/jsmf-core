@@ -180,26 +180,26 @@ Class.prototype.setReference = function (name, type, cardinality, opposite, comp
 };
 
 /******************************
-//Enum definition : should extend class? or a super class classifier?
+//Enum definition 
 *****************************/
-function Enum(name, literals) {
+function Enum(name) {
     this.__name = name;
-    this.__literals = literals || {};
+    this.__literals = [];
     return this;
 }
 
 Enum.prototype.conformsTo = function() {return Enum;}
 
 Enum.prototype.setLiteral = function(name, value) {
-     if (_.includes(this.__literals, name)) {
-        console.log("Try to set existing litteral " + name + " for Enum " + this);
-     } else {
-        this.__literals[name]=value;
+     if (_.contains(this.__literals, name)) {} else {
+        this.__literals.push(value);
+        this[name]=value;
      }
 };
 
-Enum.prototype.getValue= function(name) {
-    return this.__literals[name];
+
+Enum.prototype.isEnum = function() {
+    return true;   
 }
 
 /****************************************************************************************
@@ -207,15 +207,26 @@ Enum.prototype.getValue= function(name) {
 ****************************************************************************************/
 function makeAssignation(ob, index, attype) {
     //if attype = primitive JS type else ...
-    var type = new attype;
-    return function (param) {
-        if (param.__proto__ == type.__proto__) {
-            ob[index] = param;
-        } else {
-            throw new Error("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
-            //console.log("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
-        }
-    };
+	if ((typeof attype.isEnum !== 'undefined') && (attype.isEnum())) {
+        return function (param) {
+            var val = param;
+            if (_.contains(attype.__literals,val)) {
+                ob[index] = val;
+            } else {
+                console.log("Error when assigning enum value: "+param);
+            }
+        };        
+    }  else {
+        var type = new attype;
+        return function (param) {
+            if (param.__proto__ == type.__proto__) {
+                ob[index] = param;
+            } else {
+                throw new Error("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
+                //console.log("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
+            }
+        };
+ }
 }
 
 // Adding the creation of opposite except for ARRAY of Type
@@ -313,7 +324,6 @@ Class.prototype.newInstance = function (init) {
 
     return result;
 };
-
 //Export three main framework functions
 module.exports = {
 

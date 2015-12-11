@@ -69,12 +69,18 @@ Model.prototype.setReferenceModel = function (metamodel) {
 
 
 //M2
-function Class(name, attributes, references) {
+function Class(name, supertypes, attributes, references) {
     this.__name = name;
     this.__attributes = {};
     this.__references = {};
     this.__superType = {};
     var self = this;
+    supertypes = (supertypes || []) instanceof Array
+                 ? supertypes
+                 : [supertypes];
+    _.forEach(supertypes, function(s) {
+        self.setSuperType(s);
+    });
     _.forEach(attributes, function (type, name) {
       self.setAttribute(name, type);
     });
@@ -88,8 +94,8 @@ function Class(name, attributes, references) {
     });
 }
 
-Class.newInstance = function (classname, attributes, references) {
-    var Obj = new Class(classname, attributes, references);  //here check promote/demote functions
+Class.newInstance = function (classname, supertypes, attributes, references) {
+    var Obj = new Class(classname, supertypes, attributes, references);  //here check promote/demote functions
     return Obj;
 };
 
@@ -176,9 +182,9 @@ Class.prototype.setReference = function (name, type, cardinality, opposite, comp
 /******************************
 //Enum definition : should extend class? or a super class classifier?
 *****************************/
-function Enum(name) {
+function Enum(name, literals) {
     this.__name = name;
-    this.__literals = {};
+    this.__literals = literals || {};
     return this;
 }
 
@@ -256,10 +262,10 @@ function makeReference(ob, index, type, card, opposite, composite, associated) {
 Class.prototype.newInstance = function (init) {
     var result = {};
     var self = this;
-    var setterName = function (s) {
+    function setterName(s) {
       return 'set' + s[0].toUpperCase() + s.slice(1);
     }
-    var createAttributesSetter = function (type) {
+    function createAttributesSetter(type) {
         _.forEach (type.__attributes, function(attype, sup) {
             if(attype.conformsTo== undefined) {
                 result[sup] = new attype(); //Work with JS primitve types only.
@@ -272,7 +278,7 @@ Class.prototype.newInstance = function (init) {
             }
         });
     };
-    var createReferencesSetter = function (type) {
+    function createReferencesSetter(type) {
         _.forEach (type.__references, function(ref, sup) {
             result[sup] = [];
             var type = ref.type;

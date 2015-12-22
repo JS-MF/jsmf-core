@@ -978,7 +978,7 @@ describe('Create Class Instances', function() {
 })
 
 // ************************************************************
-//	Test Enumerations
+//    Test Enumerations
 // ************************************************************/
 describe('Create Enumeration', function() {
         it('Instance Created with enumerated value', function(done){
@@ -987,18 +987,34 @@ describe('Create Enumeration', function() {
             var E1 = new Enum('IType');
             E1.setLiteral('v1',0);
             E1.setLiteral('v2',2);
-            
+
             State.setAttribute('name',String);
             State.setAttribute('type',E1);
-            
-			var s0 = State.newInstance();
+
+            var s0 = State.newInstance();
             s0.setName('First State');
-            s0.setType(E1.v1);  
+            s0.setType(E1.v1);
 
             s0.should.have.property('type', 0);
             s0.should.have.property('name','First State');
             done();
-	});
+    });
+        it('Instance Created with inline enumerated values', function(done){
+            var State = Class.newInstance('State');
+
+            var E1 = new Enum('IType', {v1: 0, v2: 2});
+
+            State.setAttribute('name',String);
+            State.setAttribute('type',E1);
+
+            var s0 = State.newInstance();
+            s0.setName('First State');
+            s0.setType(E1.v1);
+
+            s0.should.have.property('type', 0);
+            s0.should.have.property('name','First State');
+            done();
+    });
 
     it('Instance Created with incorrect enumerated value', function(done){
             var State = Class.newInstance('State');
@@ -1006,15 +1022,15 @@ describe('Create Enumeration', function() {
             var E1 = new Enum('IType');
             E1.setLiteral('v1',0);
             E1.setLiteral('v2',2);
-            
+
             State.setAttribute('name',String);
             State.setAttribute('type',E1);
-            
-			var s0 = State.newInstance();
-            s0.setName('First State');
-            s0.setType(3);  
 
-            s0.should.have.property('type', 3);
+            var s0 = State.newInstance();
+            s0.setName('First State');
+            s0.setType(3);
+
+            s0.should.not.have.property('type', 3);
             s0.should.have.property('name','First State');
             done();
     });

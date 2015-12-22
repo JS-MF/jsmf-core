@@ -182,24 +182,26 @@ Class.prototype.setReference = function (name, type, cardinality, opposite, comp
 /******************************
 //Enum definition 
 *****************************/
-function Enum(name) {
+function Enum(name, values) {
+    var self = this;
     this.__name = name;
     this.__literals = [];
+    _.forEach(values, function (v, k) { self.setLiteral(k, v);});
     return this;
 }
 
 Enum.prototype.conformsTo = function() {return Enum;}
 
 Enum.prototype.setLiteral = function(name, value) {
-     if (_.contains(this.__literals, name)) {} else {
-        this.__literals.push(value);
-        this[name]=value;
+     if (!(_.contains(this.__literals, name))) {
+         this.__literals.push(value);
+         this[name]=value;
      }
 };
 
 
 Enum.prototype.isEnum = function() {
-    return true;   
+    return true;
 }
 
 /****************************************************************************************
@@ -207,7 +209,7 @@ Enum.prototype.isEnum = function() {
 ****************************************************************************************/
 function makeAssignation(ob, index, attype) {
     //if attype = primitive JS type else ...
-	if ((typeof attype.isEnum !== 'undefined') && (attype.isEnum())) {
+    if ((typeof attype.isEnum !== 'undefined') && (attype.isEnum())) {
         return function (param) {
             var val = param;
             if (_.contains(attype.__literals,val)) {
@@ -215,7 +217,7 @@ function makeAssignation(ob, index, attype) {
             } else {
                 console.log("Error when assigning enum value: "+param);
             }
-        };        
+        };
     }  else {
         var type = new attype;
         return function (param) {

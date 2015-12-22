@@ -1034,6 +1034,19 @@ describe('Create Enumeration', function() {
             s0.should.have.property('name','First State');
             done();
     });
+
+    it('esolve instance values', function(done){
+            var State = Class.newInstance('State');
+
+            var E1 = new Enum('IType');
+            E1.setLiteral('v1',0);
+            E1.setLiteral('v2',2);
+
+            E1.resolve(0).should.be.equal('v1');
+            E1.resolve(2).should.be.equal('v2');
+            (E1.resolve(1) === undefined).should.be.equal(true);
+            done();
+    });
 });
 /**********************************************************
 // Model/Metamodel (aka package/namespace) Creation

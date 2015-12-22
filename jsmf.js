@@ -199,6 +199,9 @@ Enum.prototype.setLiteral = function(name, value) {
      }
 };
 
+Enum.prototype.resolve = function(value) {
+    return _.findKey(this, function(x) { return x === value; })
+}
 
 Enum.prototype.isEnum = function() {
     return true;

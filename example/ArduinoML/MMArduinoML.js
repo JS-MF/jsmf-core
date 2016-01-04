@@ -8,13 +8,11 @@ var Enum;
     Model = JSMF.Model;
     Class = JSMF.Class;
     Enum = JSMF.Enum;
-}).call(undefined, undefined);
+}).call();
 
 var ArduinoML = new Model('ArduinoML');
 
-var Signal = new Enum('Signal');
-Signal.setLiteral('LOW', 0);
-Signal.setLiteral('HIGH', 1);
+var Signal = new Enum('Signal', {LOW: 0, HIGH: 1});
 
 var NamedElement = Class.newInstance('NamedElement', [], {name: String});
 
@@ -42,8 +40,7 @@ Action.setReference('actuator', Actuator, 1);
 App.setReference('bricks', Brick, -1);
 
 
-ArduinoML.add(NamedElement);
-ArduinoML.setModellingElements([NamedElement, App, State, Brick, Action, Transition, Sensor, Actuator]);
+ArduinoML.setModellingElements([Signal, NamedElement, App, State, Brick, Action, Transition, Sensor, Actuator]);
 
 module.exports = {
   ArduinoML: ArduinoML,

@@ -164,9 +164,9 @@ Class.prototype.conformsTo = function () {
 Class.prototype.setReference = function (name, type, cardinality, opposite, composite, associated) {
     //check name?
     this.__references[name] = {
-        "type": type, //should check the type
-        "card": cardinality,
-        "associated":associated
+        type: type, //should check the type
+        card: cardinality,
+        associated: associated
     }
     if (opposite !== undefined) {
         var tmp = this.__references[name];
@@ -179,9 +179,9 @@ Class.prototype.setReference = function (name, type, cardinality, opposite, comp
 
 };
 
-/******************************
-//Enum definition 
-*****************************/
+/*****************************
+ * Enum definition           *
+ *****************************/
 function Enum(name, values) {
     var self = this;
     this.__name = name;
@@ -231,7 +231,7 @@ function makeAssignation(ob, index, attype) {
                 //console.log("Assigning wrong type: " + param.__proto__ + " expected " + type.__proto__);
             }
         };
- }
+    }
 }
 
 // Adding the creation of opposite except for ARRAY of Type
@@ -248,9 +248,9 @@ function makeReference(ob, index, type, card, opposite, composite, associated) {
         } else if (type === Class) { // <=> bypasscheckType, equivalent to oclAny
             ob[index].push(param);
             ob.associated.push({
-                "ref":index,
-                "elem":elementsinrelation,
-                "associated":associated
+                ref: index,
+                elem: elementsinrelation,
+                associated: associated
             });
         } else if (hasClass(param, types)) {
              if(_.includes(ob[index],param)) {
@@ -258,7 +258,7 @@ function makeReference(ob, index, type, card, opposite, composite, associated) {
                  //maybe assigning it because of circular opposite relation
              } else {
                  ob[index].push(param); //ob[index]=param...
-                 ob.associated.push({"ref":index, "elem":elementsinrelation, "associated":associated});
+                 ob.associated.push({ref: index, elem: elementsinrelation, associated: associated});
                  if(opposite!=undefined) {
                       if (param[opposite] == undefined) { param[opposite] = []; }
                       param[opposite].push(ob);
@@ -283,10 +283,10 @@ Class.prototype.newInstance = function (init) {
     }
     function createAttributesSetter(type) {
         _.forEach (type.__attributes, function(attype, sup) {
-            if(attype.conformsTo== undefined) {
+            if(attype.conformsTo == undefined) {
                 result[sup] = new attype(); //Work with JS primitve types only.
-            } else {
-                console.log(attype); //TODO: add behavior for jsmf class instance
+            // } else {
+            //    console.log(attype); //TODO: add behavior for jsmf class instance
             }
             result[setterName(sup)] = makeAssignation(result, sup, attype);
             if (init instanceof Object && init[sup] != undefined) {

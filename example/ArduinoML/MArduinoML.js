@@ -8,7 +8,7 @@ var Model;
     var JSMF = require('../../jsmf.js');
     Model = JSMF.Model;
     Class = JSMF.Class;
-}).call(undefined, undefined);
+}).call();
 
 var switchExample = new Model('Switch!');
 switchExample.setReferenceModel(AML.ArduinoML);
@@ -20,16 +20,16 @@ var led = AML.Actuator.newInstance({name: 'led', pin: 12});
  * on state
  */
 
-var aOn = AML.Action.newInstance({value: AML.Signal.getValue('HIGH'), actuator: led});
-var tOn = AML.Transition.newInstance({value: AML.Signal.getValue('HIGH'), sensor: button});
+var aOn = AML.Action.newInstance({value: AML.Signal.HIGH, actuator: led});
+var tOn = AML.Transition.newInstance({value: AML.Signal.HIGH, sensor: button});
 var on = AML.State.newInstance({name: 'on', action: aOn, transition: tOn})
 
 /*
  * off state
  */
 
-var aOff = AML.Action.newInstance({value: AML.Signal.getValue('LOW'), actuator: led});
-var tOff = AML.Transition.newInstance({value: AML.Signal.getValue('LOW'), sensor: button});
+var aOff = AML.Action.newInstance({value: AML.Signal.LOW, actuator: led});
+var tOff = AML.Transition.newInstance({value: AML.Signal.HIGH, sensor: button});
 var off = AML.State.newInstance({name: 'off', action: aOff, transition: tOff})
 
 

@@ -1097,5 +1097,20 @@ describe('Create a Model (Namespace/Package)', function() {
             console.log(modelI.modellingElements[State]);
             done();
             })
+
+        it("Add elements to the model recursively", function (done) {
+            var State = Class.newInstance('State');
+            var Transition = Class.newInstance('Transition');
+            State.setReference('transition', Transition, -1);
+            var t0 = Transition.newInstance();
+            var t1 = Transition.newInstance();
+            var s0 = State.newInstance({transition: [t0, t1]});
+            var modelI = new Model('Model', s0);
+            modelI.modellingElements.should.have.keys(['State', 'Transition']);
+            modelI.modellingElements.should.have.property('State',[s0]);
+            modelI.modellingElements['Transition'].should.containEql(t0);
+            modelI.modellingElements['Transition'].should.containEql(t1);
+            done();
+        });
     })
 })

@@ -14,10 +14,25 @@ var _ = require('lodash');
 
 //DEF: Check Type Strict, Partial, None | Check Cardinality Strict, Partial, None, ...
 //Natural => Formal
-function Model(name) {
+function Model(name, entryPoint) {
     this.__name = name;
     this.referenceModel = {}; //set the metamodel of this
     this.modellingElements = {};
+    if (entryPoint !== undefined) {
+        var visited = [];
+        var toVisit = entryPoint instanceof Array ? entryPoint : [entryPoint];
+        while (!_.isEmpty(toVisit)) {
+            var e = toVisit.pop();
+            //WARNING CHECK if classs is defined
+            if (!_.contains(visited, e)) {
+                visited.push(e);
+                this.setModellingElement(e);
+                var refs = e.conformsTo().getAllReferences();
+                var newNodes = _.flatten(_.map(refs, function(v, x) {return e[x];}));
+                toVisit = toVisit.concat(newNodes);
+            }
+        }
+    }
 }
 
 //WARNING CHECK if classs is defined

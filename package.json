@@ -1,6 +1,6 @@
 {
   "name": "jsmf",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Javascript Modelling Framework",
   "main": "jsmf.js",
   "directories": {
@@ -27,7 +27,7 @@
   "dependencies": {
     "lodash": "~3.10.1",
     "circular-json": "~0.2.0",
-    "object-hash": "~0.9.2"
+    "uuid": "~2.0.1"
   },
   "devDependencies": {
     "should": "~7.1.1",

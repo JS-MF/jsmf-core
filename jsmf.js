@@ -11,6 +11,7 @@ Contributor : N. Biri
 'use strict';
 
 var _ = require('lodash');
+var uuid = require('uuid');
 
 //DEF: Check Type Strict, Partial, None | Check Cardinality Strict, Partial, None, ...
 //Natural => Formal
@@ -341,7 +342,7 @@ Class.prototype.newInstance = function (init) {
     result.conformsTo = function () {
         return self;
     };
-
+    result.__jsmfId = uuid.v4();
     return result;
 };
 //Export three main framework functions

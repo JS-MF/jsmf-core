@@ -190,10 +190,17 @@ describe('Create Class Elements', function() {
 // Create and Check Instances
 describe('Create Class Instances', function() {
     describe('Create Instances (Attributes)', function() {
-        it('Instance Created and Conforms to Meta Element', function(done){
+        it('creates instances conforms to Meta Element', function(done){
             var State = Class.newInstance('State');
             var s1 = State.newInstance('s1');
             s1.conformsTo().should.equal(State);
+            done();
+        })
+
+        it('creates instances with an id (uuid)', function(done){
+            var State = Class.newInstance('State');
+            var s1 = State.newInstance('s1');
+            s1.__jsmfId.should.not.equal(undefined);
             done();
         })
 
@@ -907,7 +914,9 @@ describe('Create Class Instances', function() {
             s1.transition.should.be.empty;
 
             t1 = Transition.newInstance();
+            t1.name = 'foo';
             st1 = SuperTransition.newInstance();
+            st1.name = 'bar';
 
             s1.setTransition(t1);
             s1.should.have.property('transition',[t1]);
@@ -915,7 +924,7 @@ describe('Create Class Instances', function() {
             //That should not work (inherited references) => but it may work with relaxed JSMF (cumulative types).
             s1.setTransition(st1);
             //console.log(s1.transition.conformsTo());
-            s1.should.have.property('transition',[st1]);
+            s1.should.have.property('transition',[t1]);
 
             done();
         })

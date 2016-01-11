@@ -1,5 +1,5 @@
 {
-  "name": "jsmf",
+  "name": "jsmf-core",
   "version": "0.3.0",
   "description": "Javascript Modelling Framework",
   "main": "jsmf.js",

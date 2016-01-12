@@ -1,6 +1,6 @@
 var assert = require("assert");
 var should = require('should');
-var JSMF = require('../jsmf');
+var JSMF = require('../index');
 Class = JSMF.Class;
 Model = JSMF.Model; 
 

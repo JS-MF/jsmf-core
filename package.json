@@ -26,7 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "~3.10.1",
-    "circular-json": "~0.2.0",
     "uuid": "~2.0.1"
   },
   "devDependencies": {

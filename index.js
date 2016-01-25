@@ -225,12 +225,14 @@ Class.prototype.getAllReferences = function() {
 
 /** get all the Attributes of an object */
 Class.prototype.getAllAttributes = function() {
-    return _.reduce (this.getInheritanceChain(),
-        function(result, refSuperType) {
-            result.push(refSuperType.__attributes);
-        },
-        [this.__attribute]
-        );
+    var result={};
+    var allsuperTypes = this.getInheritanceChain();
+    _.forEach(allsuperTypes, function(refSuperType) {
+        _.forEach(refSuperType.__attributes, function(elem, index) {
+            result[index]=elem;
+        });
+    });
+    return result;
 }
 
 /* ************************* *

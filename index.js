@@ -117,7 +117,8 @@ function Class(name, supertypes, attributes, references) {
     this.__references = {};
     this.__superType = {};
     var self = this;
-    supertypes = (supertypes || []) instanceof Array
+    supertypes = supertypes || [];
+    supertypes = supertypes instanceof Array
                  ? supertypes
                  : [supertypes];
     _.forEach(supertypes, function(s) {

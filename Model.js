@@ -1,0 +1,99 @@
+'use strict';
+
+var _ = require('lodash');
+
+var isJSMFElement, conformsTo;
+(function() {
+    var common = require('./Common');
+    isJSMFElement = common.isJSMFElement;
+    conformsTo = common.conformsTo;
+}).call();
+
+var isJSMFEnum;
+(function() {
+    var e = require('./Enum');
+    isJSMFEnum = e.isJSMFEnum;
+}).call();
+
+
+var isJSMFClass;
+(function() {
+    var cls = require('./Class');
+    isJSMFClass = cls.isJSMFClass;
+}).call();
+
+
+function Model(name, referenceModel, modellingElements, transitive) {
+    this.__name = name;
+    this.referenceModel = referenceModel;
+    this.modellingElements = {};
+    if (modellingElements !== undefined) {
+        modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements];
+        if (transitive) {
+            this.modellingElements = cralwElements(modellingElements);
+        } else {
+            var self = this;
+            _.forEach(modellingElements, function(e) {self.addModellingElement(e)});
+        }
+    }
+}
+
+function modelExport(m) {
+    var extractedFirst = _.mapValues(m.modellingElements, function(x) {return x[0];});
+    var result = _.pickBy(extractedFirst, function(x) {return isJSMFClass(x) || isJSMFEnum(x);});
+    result[m.__name] = m;
+    return result;
+}
+
+Model.prototype.addModellingElement = function(es) {
+    var self = this;
+    es = es instanceof Array ? es : [es];
+    _.forEach(es, function(e) {
+        if (!isJSMFElement(e)) {throw new TypeError('can\'t Add ' + e + ' to model ' + self);}
+        var key;
+        if (isJSMFClass(e) || isJSMFEnum(e)) {
+            key = e.__name;
+        } else {
+            key = conformsTo(e).__name;
+        }
+        var current = self.modellingElements[key] || [];
+        current.push(e);
+        self.modellingElements[key] = current;
+    });
+}
+
+Model.prototype.setModellingElements = Model.prototype.addModellingElement;
+Model.prototype.add = Model.prototype.addModellingElement;
+Model.prototype.setReferenceModel = function(rm) { this.referenceModel = rm; }
+
+function cralwElements(init) {
+    var visited = [];
+    var toVisit = init;
+    while (!_.isEmpty(toVisit)) {
+        var e = toVisit.pop();
+        if (!_.includes(visited, e)) {
+            visited.push(e);
+            var refs = {};
+            var newNodes = [];
+            if (isJSMFClass(e)) {
+                refs = e.getAllReferences();
+                var refTypes = _.map(refs, function(v) {return v.type;});
+                var attrs = e.getAllAttributes();
+                var attrsEnum = _.filter(_.values(attrs), isJSMFEnum);
+                newNodes = _.flatten([refTypes, attrsEnum, e.getInheritanceChain()]);
+            } else if (isJSMFEnum(e)) {
+                newNodes = [];
+            } else if (isJSMFElement(e)) {
+              refs = conformsTo(e).getAllReferences();
+              newNodes = _.flatten(_.map(refs, function(v, x) {return e[x];}));
+            }
+            toVisit = toVisit.concat(newNodes);
+        }
+    }
+    return visited;
+}
+
+module.exports =
+    { Model: Model
+    , modelExport: modelExport
+    }

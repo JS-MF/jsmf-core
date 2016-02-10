@@ -25,7 +25,7 @@ var isJSMFClass;
 
 function Model(name, referenceModel, modellingElements, transitive) {
     this.__name = name;
-    this.referenceModel = referenceModel;
+    this.referenceModel = referenceModel || {};
     this.modellingElements = {};
     if (modellingElements !== undefined) {
         modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements];

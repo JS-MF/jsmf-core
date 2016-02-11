@@ -62,8 +62,8 @@ Model.prototype.addModellingElement = function(es) {
     });
 }
 
-Model.prototype.Filter = function(className) {
-    return this.modellingElements[className];
+Model.prototype.Filter = function(cls) {
+    return this.modellingElements[_.get(cls, '__name')];
 }
 
 Model.prototype.setModellingElements = Model.prototype.addModellingElement;

@@ -15,8 +15,11 @@ var Cardinality = require('./Cardinality').Cardinality
 function Class(name, superClasses, attributes, references) {
     function jsmfElement(attr) {
         var o = this;
-        Object.defineProperty(o, '__meta__', { value: elementMeta(jsmfElement) });
-        Object.defineProperty(o, 'conformsTo', {value: function() {return conformsTo(o);}});
+        Object.defineProperties(o,
+            { __meta__: {value: elementMeta(jsmfElement)}
+            , conformsTo: {value: function() {return conformsTo(o);}}
+            , getAssociated: {value: getAssociated, enumerable: false}
+            });
         createAttributes(o, jsmfElement);
         createReferences(o, jsmfElement);
         _.forEach(attr, function(v,k) {
@@ -88,6 +91,14 @@ function getAllReferences() {
                 acc);
         },
         {});
+}
+
+function getAssociated(name) {
+    if (name === undefined) {
+        return _.get(this, ['__meta__', 'associated']);
+    } else {
+        return _.get(this, ['__meta__', 'associated', name]);
+    }
 }
 
 function addReferences(descriptors) {

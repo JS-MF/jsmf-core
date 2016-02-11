@@ -151,7 +151,7 @@ describe('Class instance', function() {
             done();
         });
 
-        it ('add elements to opposite relation', function(done) {
+        it ('adds elements to opposite relation', function(done) {
             var s = new State();
             var t1 = new Transition();
             var t2 = new Transition();
@@ -161,7 +161,7 @@ describe('Class instance', function() {
             done();
         });
 
-        it ('assign elements from opposite relation', function(done) {
+        it ('assigns elements from opposite relation', function(done) {
             var s = new State();
             var t1 = new Transition();
             var t2 = new Transition();
@@ -171,6 +171,13 @@ describe('Class instance', function() {
             done();
         });
 
+        it ('allows the definition of associated data', function(done) {
+            var s = new State();
+            var t1 = new Transition();
+            s.addTransitions(t1, "Associated data");
+            s.getAssociated('transitions').should.eql([{elem: t1, associated: "Associated data"}]);
+            done();
+        });
     });
 
 });

@@ -62,7 +62,7 @@ Model.prototype.addModellingElement = function(es) {
     });
 }
 
-Model.prototype.Filter(className) {
+Model.prototype.Filter = function(className) {
     return this.modellingElements[className];
 }
 

@@ -13,6 +13,7 @@ function Enum(name, values) {
     function jsmfEnum(x) {return _.includes(jsmfEnum, x)} ;
     jsmfEnum.__name = name;
     Object.defineProperty(jsmfEnum, '__meta__', {value: {uuid: uuid.v4(), conformsTo: Enum}});
+    Object.defineProperty(jsmfEnum, 'getName', {value: getName});
     if (values instanceof Array) {
         _.forEach(values, function(v, k) {
             jsmfEnum[v] = k;
@@ -25,7 +26,7 @@ function Enum(name, values) {
     return jsmfEnum;
 }
 
-Enum.prototype.getName = function(o) {
+function getName(o) {
   return _.findKey(this, function(v) { return v === o;});
 }
 

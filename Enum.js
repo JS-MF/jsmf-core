@@ -12,8 +12,11 @@ var conformsTo;
 function Enum(name, values) {
     function jsmfEnum(x) {return _.includes(jsmfEnum, x)} ;
     jsmfEnum.__name = name;
-    Object.defineProperty(jsmfEnum, '__meta__', {value: {uuid: uuid.v4(), conformsTo: Enum}});
-    Object.defineProperty(jsmfEnum, 'getName', {value: getName});
+    Object.defineProperties(jsmfEnum,
+        { __meta__: {value: {uuid: uuid.v4(), conformsTo: Enum}}
+        , getName: {value: getName}
+        , conformsTo: {value: function() { return conformsTo(jsmfEnum);}}
+        });
     if (values instanceof Array) {
         _.forEach(values, function(v, k) {
             jsmfEnum[v] = k;

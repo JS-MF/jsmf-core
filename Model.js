@@ -30,7 +30,7 @@ function Model(name, referenceModel, modellingElements, transitive) {
     if (modellingElements !== undefined) {
         modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements];
         if (transitive) {
-            this.modellingElements = cralwElements(modellingElements);
+            this.modellingElements = crawlElements(modellingElements);
         } else {
             var self = this;
             _.forEach(modellingElements, function(e) {self.addModellingElement(e)});
@@ -66,7 +66,7 @@ Model.prototype.setModellingElements = Model.prototype.addModellingElement;
 Model.prototype.add = Model.prototype.addModellingElement;
 Model.prototype.setReferenceModel = function(rm) { this.referenceModel = rm; }
 
-function cralwElements(init) {
+function crawlElements(init) {
     var visited = [];
     var toVisit = init;
     while (!_.isEmpty(toVisit)) {
@@ -90,8 +90,25 @@ function cralwElements(init) {
             toVisit = toVisit.concat(newNodes);
         }
     }
-    return visited;
+    return dispatch(visited);
 }
+
+function dispatch(elems) {
+    var result = {};
+    _.forEach(elems, function(e) {
+        var key;
+        if (isJSMFClass(e) || isJSMFEnum(e)) {
+            key = e.__name;
+        } else if (isJSMFElement(e)) {
+            key = e.conformsTo().__name;
+        }
+        var values = result[key] || [];
+        values.push(e);
+        result[key] = values;
+    });
+    return result;
+}
+
 
 module.exports =
     { Model: Model

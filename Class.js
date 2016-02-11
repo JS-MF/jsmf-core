@@ -188,7 +188,6 @@ function createReferences(e, cls) {
         e.__meta__.references[name] = [];
         createAddReference(e, name);
         createRemoveReference(e, name);
-        createSetReference(e, name, desc);
         createReference(e, name, desc);
     });
 }
@@ -220,38 +219,30 @@ function createSetAttribute(o, name, type) {
 function createReference(o, name, desc) {
     Object.defineProperty(o, name,
         { get: function() {return o.__meta__.references[name];}
-        , set: o[setName(name)]
+        , set: function(xs) {
+              xs = xs instanceof Array ? xs : [xs];
+              var invalid = _.filter(xs, function(x) {
+                  var type = conformsTo(x);
+                  return type === undefined || !_.includes(type.getInheritanceChain(), desc.type);
+              });
+              if (!_.isEmpty(invalid)) {
+                    throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);
+              }
+              o.__meta__.associated[name] = [];
+              if (desc.opposite !== undefined) {
+                  var removed = _.difference(o[name], xs);
+                  _.forEach(removed, function(y) {
+                      _.remove(y.__meta__.references[desc.opposite],
+                               function(z) {return z === o});
+                  });
+                  var added = _.difference(xs, o[name]);
+                  _.forEach(added, function(y) {
+                      y.__meta__.references[desc.opposite].push(o);
+                  });
+              }
+              o.__meta__.references[name] = xs;
+          }
         , enumerable: true
-        }
-    );
-}
-
-function createSetReference(o, name, desc) {
-    Object.defineProperty(o, setName(name),
-        {value: function(xs) {
-            xs = xs instanceof Array ? xs : [xs];
-            var invalid = _.filter(xs, function(x) {
-                var type = conformsTo(x);
-                return type === undefined || !_.includes(type.getInheritanceChain(), desc.type);
-            });
-            if (!_.isEmpty(invalid)) {
-                  throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);
-            }
-            o.__meta__.associated[name] = [];
-            if (desc.opposite !== undefined) {
-                var removed = _.difference(o[name], xs);
-                _.forEach(removed, function(y) {
-                    _.remove(y.__meta__.references[desc.opposite],
-                             function(z) {return z === o});
-                });
-                var added = _.difference(xs, o[name]);
-                _.forEach(added, function(y) {
-                    y.__meta__.references[desc.opposite].push(o);
-                });
-            }
-            o.__meta__.references[name] = xs;
-        }
-        , enumerable: false
         });
 }
 

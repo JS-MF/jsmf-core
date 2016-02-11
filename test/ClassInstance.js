@@ -113,20 +113,12 @@ describe('Class instance', function() {
             done();
         });
 
-        it('can use setter syntax to set attributes', function(done) {
-            var s = new State();
-            var t = new Transition();
-            s.setTransitions([t]);
-            s.should.have.property('transitions', [t]);
-            done();
-        });
-
-        it('replace former references when we use the setter', function(done) {
+        it('replace former references when we use assignement', function(done) {
             var s = new State();
             var t1 = new Transition();
             var t2 = new Transition();
-            s.setTransitions([t1]);
-            s.setTransitions(t2);
+            s.transitions = [t1];
+            s.transitions = t2;
             s.should.have.property('transitions', [t2]);
             done();
         });

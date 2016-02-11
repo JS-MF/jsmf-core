@@ -62,6 +62,10 @@ Model.prototype.addModellingElement = function(es) {
     });
 }
 
+Model.prototype.Filter(className) {
+    return this.modellingElements[className];
+}
+
 Model.prototype.setModellingElements = Model.prototype.addModellingElement;
 Model.prototype.add = Model.prototype.addModellingElement;
 Model.prototype.setReferenceModel = function(rm) { this.referenceModel = rm; }

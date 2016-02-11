@@ -25,10 +25,9 @@ describe('Create Dynamic Instances', function() {
             State.setReference('transition', Transition, -1);
             State.setReference('property', Property, 1);
 
-            s1 = State.newInstance('s1');
-            s1 = State.newInstance('s1');
+            var s1 = State.newInstance('s1');
             var tabOfInstance = {};
-            for(i in State.references) {
+            for(var i in State.references) {
                 var Type = State.references[i].type;
                 tabOfInstance[Type.__name]=Type.newInstance();
             }
@@ -66,9 +65,9 @@ describe('Create Dynamic Instances', function() {
             State.setReference('transition', Transition, -1);
             State.setSuperType(SuperState);
 
-            s1 = State.newInstance('s1');
+            var s1 = State.newInstance('s1');
             var tabOfInstance = {};
-            for(i in State.references) {
+            for(var i in State.references) {
                 var Type = State.references[i].type;
                 tabOfInstance[Type.__name]=Type.newInstance();
             }

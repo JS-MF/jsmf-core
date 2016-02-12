@@ -104,14 +104,14 @@ function getAssociated(name) {
 function addReferences(descriptors) {
     var self = this;
     _.forEach(descriptors, function (desc, k) {
-        self.addReference(k, desc.target, desc.cardinality, desc.opposite, desc.oppositeCardinality);
+        self.addReference(k, desc.target, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated);
     });
 }
 
-function addReference(name, target, sourceCardinality, opposite, oppositeCardinality) {
+function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated) {
     this.references[name] = { type: target
-                              , cardinality: Cardinality.check(sourceCardinality)
-                              };
+                            , cardinality: Cardinality.check(sourceCardinality)
+                            };
     if (opposite !== undefined) {
         this.references[name].opposite = opposite;
         target.references[opposite] =
@@ -119,6 +119,12 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
             , cardinality: Cardinality.check(oppositeCardinality)
             , opposite: name
             };
+    }
+    if (associated !== undefined) {
+        this.references[name].associated = associated;
+        if (opposite !== undefined) {
+            target.references[opposite].associated = associated;
+        }
     }
 }
 
@@ -186,7 +192,7 @@ function createReferences(e, cls) {
     _.forEach(cls.getAllReferences(), function(desc, name) {
         e.__meta__.associated[name] = [];
         e.__meta__.references[name] = [];
-        createAddReference(e, name);
+        createAddReference(e, name, desc);
         createRemoveReference(e, name);
         createReference(e, name, desc);
     });
@@ -257,7 +263,13 @@ function createAddReference(o, name, desc) {
             associationMap[name] = backup;
             if (associated !== undefined) {
                 associationMap[name] = associationMap[name] || [];
+                if (desc.associated !== undefined
+                  && !_.includes(associated.conformsTo().getInheritanceChain(), desc.associated)) {
+                    throw new Error('Invalid association ' + associated + ' for object' + o)
+                }
                 _.forEach(xs, function(x) {
+                    console.log(name);
+                    console.log({elem: x, associated: associated});
                     associationMap[name].push({elem: x, associated: associated});
                 });
             }

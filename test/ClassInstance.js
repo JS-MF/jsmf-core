@@ -170,6 +170,26 @@ describe('Class instance', function() {
             s.getAssociated('transitions').should.eql([{elem: t1, associated: "Associated data"}]);
             done();
         });
+
+        it ('reject associated data of the wrong type', function(done) {
+            var s = new State();
+            var T = new JSMF.Class('T');
+            T.addReference('test', State, JSMF.Cardinality.any, undefined, undefined, State);
+            var t1 = new T();
+            t1.addTest(s, s);
+            t1.getAssociated('test').should.eql([{elem: s, associated: s}]);
+            done();
+        });
+
+        it ('reject associated data of the wrong type', function(done) {
+            var s = new State();
+            var T = new JSMF.Class('T');
+            T.addReference('test', State, JSMF.Cardinality.any, undefined, undefined, State);
+            var t1 = new T();
+            (function () {t1.addTest(s, t1)}).should.throw();
+            done();
+        });
+
     });
 
 });

@@ -259,7 +259,12 @@ function createAddReference(o, name, desc) {
             xs = xs instanceof Array ? xs : [xs];
             var associationMap = o.__meta__.associated;
             var backup = associationMap[name];
-            o[name] = o[name].concat(xs);
+            o.__meta__.references[name] = o[name].concat(xs);
+            if (desc.opposite !== undefined) {
+                  _.forEach(xs, function(y) {
+                      y.__meta__.references[desc.opposite].push(o);
+                  });
+            }
             associationMap[name] = backup;
             if (associated !== undefined) {
                 associationMap[name] = associationMap[name] || [];
@@ -268,8 +273,6 @@ function createAddReference(o, name, desc) {
                     throw new Error('Invalid association ' + associated + ' for object' + o)
                 }
                 _.forEach(xs, function(x) {
-                    console.log(name);
-                    console.log({elem: x, associated: associated});
                     associationMap[name].push({elem: x, associated: associated});
                 });
             }

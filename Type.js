@@ -5,6 +5,8 @@ var _ = require('lodash');
 
 module.exports =
     { Number: _.isNumber
+    , Positive: function(x) {return x >= 0;}
+    , Negative: function(x) {return x <= 0;}
     , String: _.isString
     , Boolean: _.isBoolean
     , Date: _.isDate

@@ -274,6 +274,9 @@ function createAddReference(o, name, desc) {
                 }
                 _.forEach(xs, function(x) {
                     associationMap[name].push({elem: x, associated: associated});
+                    if (desc.opposite !== undefined) {
+                        x.__meta__.associated[desc.opposite].push({elem: o, associated: associated});
+                    }
                 });
             }
         }

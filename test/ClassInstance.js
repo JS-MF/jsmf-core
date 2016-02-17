@@ -171,6 +171,14 @@ describe('Class instance', function() {
             done();
         });
 
+        it ('adds the associated data to the opposite reference', function(done) {
+            var s = new State();
+            var t1 = new Transition();
+            s.addTransitions(t1, "Associated data");
+            t1.getAssociated('source').should.eql([{elem: s, associated: "Associated data"}]);
+            done();
+        });
+
         it ('reject associated data of the wrong type', function(done) {
             var s = new State();
             var T = new JSMF.Class('T');

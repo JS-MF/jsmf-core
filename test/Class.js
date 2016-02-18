@@ -138,6 +138,14 @@ describe('Class', function() {
           done();
         });
 
+        it ('can be removed', function(done) {
+          var State = new Class('State', [], {name: JSMF.String, age: Number});
+          State.removeAttribute('name');
+          State.attributes.should.not.have.property('name', JSMF.String);
+          State.attributes.should.have.property('age', JSMF.Number);
+          done();
+        });
+
     });
 
     describe('Class references', function() {
@@ -190,6 +198,7 @@ describe('Class', function() {
             var SuperPower = new Class('SuperPower');
             Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners');
             SuperPower.references.should.have.property('owners');
+            Hero.references.has.should.have.property('opposite', 'owners');
             done();
         });
 
@@ -219,6 +228,33 @@ describe('Class', function() {
             Hero.references.has.should.have.property('cardinality')
             Hero.references.has.cardinality.should.have.property('min' , 1);
             Hero.references.has.cardinality.should.have.property('max' , 1);
+            done();
+        });
+
+        it ('can be removed', function(done) {
+            var SuperPower = new Class('SuperPower');
+            var Hero = new Class('Hero', [], {}, {has: {target: SuperPower}, weakness: {target: SuperPower}});
+            Hero.removeReference('has');
+            Hero.references.should.not.have.property('has');
+            Hero.references.should.have.property('weakness');
+            done();
+        });
+
+        it('remove a removed reference from its opposite', function(done) {
+            var Hero = new Class('Hero');
+            var SuperPower = new Class('SuperPower');
+            Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners');
+            Hero.removeReference('has');
+            SuperPower.references.owners.should.not.have.property('opposite');
+            done();
+        });
+
+        it('can removed a reference and its opposite simulteneaously', function(done) {
+            var Hero = new Class('Hero');
+            var SuperPower = new Class('SuperPower');
+            Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners');
+            Hero.removeReference('has', true);
+            SuperPower.references.should.not.have.property('owners');
             done();
         });
 

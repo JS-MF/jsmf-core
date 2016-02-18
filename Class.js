@@ -128,6 +128,18 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
     }
 }
 
+function removeReference(name, opposite) {
+    var ref = this.references[name];
+    _.unset(this.references, name);
+    if (ref.opposite !== undefined) {
+        if (opposite) {
+            _.unset(ref.type.references, ref.opposite);
+        } else {
+            _.unset(ref.type.references[ref.opposite], 'opposite');
+        }
+    }
+}
+
 function getAllAttributes() {
     return _.reduce(
         this.getInheritanceChain(),
@@ -147,11 +159,13 @@ function populateClassFunction(cls) {
         , conformsTo: {value: function() {return conformsTo(cls);}, enumerable:false}
         , getAllReferences: {value: getAllReferences, enumerable: false}
         , addReference: {value: addReference, enumerable: false}
+        , removeReference: {value: removeReference, enumerable: false}
         , setReference: {value: addReference, enumerable: false}
         , addReferences: {value: addReferences, enumerable: false}
         , setReferences: {value: addReferences, enumerable: false}
         , getAllAttributes: {value: getAllAttributes, enumerable: false}
         , addAttribute: {value: addAttribute, enumerable: false}
+        , removeAttribute: {value: removeAttribute, enumerable: false}
         , setAttribute: {value: addAttribute, enumerable: false}
         , addAttributes: {value: addAttributes, enumerable: false}
         , setAttributes: {value: addAttributes, enumerable: false}
@@ -173,6 +187,10 @@ function setSuperType(s) {
 
 function addAttribute(name, type) {
   this.attributes[name] = Type.normalizeType(type);
+}
+
+function removeAttribute(name) {
+  _.unset(this.attributes, name);
 }
 
 function addAttributes(attrs) {

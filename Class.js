@@ -247,7 +247,8 @@ function createReference(o, name, desc) {
               xs = xs instanceof Array ? xs : [xs];
               var invalid = _.filter(xs, function(x) {
                   var type = conformsTo(x);
-                  return type === undefined || !_.includes(type.getInheritanceChain(), desc.type);
+                  return type === undefined
+                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Class));
               });
               if (!_.isEmpty(invalid)) {
                     throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);

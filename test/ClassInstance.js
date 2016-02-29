@@ -123,6 +123,16 @@ describe('Class instance', function() {
             done();
         });
 
+        it('accept any object for a reference that has the targetType Class', function(done) {
+            var Foo = new Class('Foo', [], {}, {test: {target: Class}});
+            var Bar = new Class('Bar');
+            var x = new Foo();
+            var y = new Bar();
+            x.test = [x,y];
+            x.should.have.property('test', [x, y]);
+            done();
+        });
+
         it('add references when we use the adder', function(done) {
             var s = new State();
             var t1 = new Transition();

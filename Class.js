@@ -241,6 +241,9 @@ function createSetAttribute(o, name, type) {
 
 
 function createReference(o, name, desc) {
+    if (desc.type === Type.JSMFAny) {
+        desc.type === undefined;
+    }
     Object.defineProperty(o, name,
         { get: function() {return o.__meta__.references[name];}
         , set: function(xs) {
@@ -248,7 +251,7 @@ function createReference(o, name, desc) {
               var invalid = _.filter(xs, function(x) {
                   var type = conformsTo(x);
                   return type === undefined
-                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Class));
+                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === undefined));
               });
               if (!_.isEmpty(invalid)) {
                     throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);

@@ -123,8 +123,18 @@ describe('Class instance', function() {
             done();
         });
 
-        it('accept any object for a reference that has the targetType Class', function(done) {
-            var Foo = new Class('Foo', [], {}, {test: {target: Class}});
+        it('accept any object for a reference that has the targetType JSMFAny', function(done) {
+            var Foo = new Class('Foo', [], {}, {test: {target: JSMF.JSMFAny}});
+            var Bar = new Class('Bar');
+            var x = new Foo();
+            var y = new Bar();
+            x.test = [x,y];
+            x.should.have.property('test', [x, y]);
+            done();
+        });
+
+        it('accept any object for a reference with no target type specified', function(done) {
+            var Foo = new Class('Foo', [], {}, {test: {}});
             var Bar = new Class('Bar');
             var x = new Foo();
             var y = new Bar();

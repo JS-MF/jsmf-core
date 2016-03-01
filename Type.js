@@ -1,6 +1,7 @@
 'use strict';
 
 var _ = require('lodash');
+var conformsTo = (require('./Common')).conformsTo;
 
 
 module.exports =
@@ -13,12 +14,13 @@ module.exports =
     , Array: _.isArray
     , Object: _.isObject
     , Range: function Range(min, max) {
-          var self = function jsmfRange(x) { return x >= min && x <= max }
+          var self = function jsmfRange(x) { return x >= min && x <= max; }
           self.typeName = 'Range';
           self.min = min;
           self.max = max;
           return self;
       }
+    , JSMFAny: function(x) {conformsTo(x) !== undefined}
     , Any: _.constant(true)
     }
 

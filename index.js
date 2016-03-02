@@ -19,4 +19,4 @@ var Enum = require('./Enum');
 var Cardinality = require('./Cardinality');
 var Type = require('./Type');
 
-module.exports = Object.assign(Common, Model, Class, Enum, Cardinality, Type);
+module.exports = _.assign(Common, Model, Class, Enum, Cardinality, Type);

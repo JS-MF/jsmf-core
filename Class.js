@@ -1,3 +1,12 @@
+/**
+ *   JavaScript Modelling Framework (JSMF)
+ *
+*
+©2015 Luxembourg Institute of Science and Technology All Rights Reserved
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+Authors : J.S. Sottet, A. Vagner, N. Biri
+*/
 'use strict';
 
 var _ = require('lodash');
@@ -12,6 +21,26 @@ var conformsTo;
 var Cardinality = require('./Cardinality').Cardinality
 
 
+/** 
+ * Creation of a JSMF Class.
+ *
+ * The attributes are given in a key value manner: the key is the name of the
+ * attribute, the valu its type.
+ *
+ * The references are also given in a key / value way. The name of the
+ * references are the keys, the value can has the following attrivutes:
+ * - type: The target type of the reference;
+ * - cardinality: the cardinality of the reference;
+ * - opposite: the name of the opposite reference;
+ * - oppositeCardinality: the cardinality of the opposite reference;
+ * - associated: the type of the associated data.
+ *
+ * @param {string} name - Name of the class
+ * @param {Class[]} superClasses - The superclasses of the current class
+ * @param {Object} attributes - the attributes of the class.
+ * @param {Object} attributes - the references of the class.
+ * @constructor
+ */
 function Class(name, superClasses, attributes, references) {
     function jsmfElement(attr) {
         var o = this;
@@ -44,6 +73,8 @@ Class.newInstance = function(name, superClasses, attributes, references) {
     return new Class(name, superClasses, attributes, references);
 }
 
+/** Check the cardinality of all the references of a JSMF element
+ */
 function checkCardinality(elem) {
     var context = {toVisit: [elem], visited: [], errors: []};
     while (context.toVisit.length > 0) {
@@ -69,6 +100,8 @@ function checkCardinality(elem) {
     return context.errors;
 }
 
+/** Return true if the given object is a JSMF Class.
+ */
 function isJSMFClass(o) {
     return conformsTo(o) === Class;
 }

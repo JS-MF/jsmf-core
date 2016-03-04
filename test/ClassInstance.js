@@ -124,7 +124,7 @@ describe('Class instance', function() {
         });
 
         it('accept any object for a reference that has the targetType JSMFAny', function(done) {
-            var Foo = new Class('Foo', [], {}, {test: {type: JSMF.JSMFAny}});
+            var Foo = new Class('Foo', [], {}, {test: {target: JSMF.JSMFAny}});
             var Bar = new Class('Bar');
             var x = new Foo();
             var y = new Bar();

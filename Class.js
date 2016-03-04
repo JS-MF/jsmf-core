@@ -137,12 +137,12 @@ function getAssociated(name) {
 function addReferences(descriptors) {
     var self = this;
     _.forEach(descriptors, function (desc, k) {
-        self.addReference(k, desc.target, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated);
+        self.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated);
     });
 }
 
 function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated) {
-    this.references[name] = { type: target
+    this.references[name] = { type: target || Type.JSMFAny
                             , cardinality: Cardinality.check(sourceCardinality)
                             };
     if (opposite !== undefined) {
@@ -274,9 +274,6 @@ function createSetAttribute(o, name, type) {
 
 
 function createReference(o, name, desc) {
-    if (desc.type === Type.JSMFAny) {
-        desc.type === undefined;
-    }
     Object.defineProperty(o, name,
         { get: function() {return o.__meta__.references[name];}
         , set: function(xs) {
@@ -284,7 +281,7 @@ function createReference(o, name, desc) {
               var invalid = _.filter(xs, function(x) {
                   var type = conformsTo(x);
                   return type === undefined
-                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === undefined));
+                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Type.JSMFAny));
               });
               if (!_.isEmpty(invalid)) {
                     throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);

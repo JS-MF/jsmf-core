@@ -20,7 +20,7 @@ module.exports =
           self.max = max;
           return self;
       }
-    , JSMFAny: function(x) {conformsTo(x) !== undefined}
+    , JSMFAny: function(x) {return conformsTo(x) !== undefined}
     , Any: _.constant(true)
     }
 

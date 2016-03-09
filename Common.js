@@ -3,11 +3,11 @@
 var _ = require('lodash');
 
 function conformsTo(o) {
-    return _.get(o, ['__meta__', 'conformsTo']);
+    return _.get(o, ['__jsmf__', 'conformsTo']);
 }
 
 function jsmfId(o) {
-    return _.get(o, ['__meta__', 'uuid']);
+    return _.get(o, ['__jsmf__', 'uuid']);
 }
 
 function isJSMFElement(o) {

@@ -45,7 +45,7 @@ function Class(name, superClasses, attributes, references) {
     function jsmfElement(attr) {
         var o = this;
         Object.defineProperties(o,
-            { __meta__: {value: elementMeta(jsmfElement)}
+            { __jsmf__: {value: elementMeta(jsmfElement)}
             , conformsTo: {value: function() {return conformsTo(o);}}
             , getAssociated: {value: getAssociated, enumerable: false}
             });
@@ -60,7 +60,7 @@ function Class(name, superClasses, attributes, references) {
     jsmfElement.superClasses = superClasses instanceof Array ? superClasses : [superClasses];
     jsmfElement.attributes = {};
     jsmfElement.references = {};
-    Object.defineProperty(jsmfElement, '__meta__', {value: classMeta()});
+    Object.defineProperty(jsmfElement, '__jsmf__', {value: classMeta()});
     populateClassFunction(jsmfElement);
     if (attributes !== undefined) { jsmfElement.addAttributes(attributes)}
     if (references !== undefined) { jsmfElement.addReferences(references)}
@@ -128,9 +128,9 @@ function getAllReferences() {
 
 function getAssociated(name) {
     if (name === undefined) {
-        return _.get(this, ['__meta__', 'associated']);
+        return _.get(this, ['__jsmf__', 'associated']);
     } else {
-        return _.get(this, ['__meta__', 'associated', name]);
+        return _.get(this, ['__jsmf__', 'associated', name]);
     }
 }
 
@@ -234,15 +234,15 @@ function addAttributes(attrs) {
 
 function createAttributes(e, cls) {
     _.forEach(cls.getAllAttributes(), function(type, name) {
-        e.__meta__.attributes[name] = undefined;
+        e.__jsmf__.attributes[name] = undefined;
         createAttribute(e, name, type);
     });
 }
 
 function createReferences(e, cls) {
     _.forEach(cls.getAllReferences(), function(desc, name) {
-        e.__meta__.associated[name] = [];
-        e.__meta__.references[name] = [];
+        e.__jsmf__.associated[name] = [];
+        e.__jsmf__.references[name] = [];
         createAddReference(e, name, desc);
         createRemoveReference(e, name);
         createReference(e, name, desc);
@@ -252,7 +252,7 @@ function createReferences(e, cls) {
 function createAttribute(o, name, type) {
     createSetAttribute(o,name, type)
     Object.defineProperty(o, name,
-        { get: function() {return o.__meta__.attributes[name];}
+        { get: function() {return o.__jsmf__.attributes[name];}
         , set: o[setName(name)]
         , enumerable: true
         }
@@ -263,7 +263,7 @@ function createSetAttribute(o, name, type) {
     Object.defineProperty(o, setName(name),
         {value: function(x) {
                 if (type(x)) {
-                    o.__meta__.attributes[name] = x;
+                    o.__jsmf__.attributes[name] = x;
                 } else {
                     throw new TypeError('Invalid assignment: ' + x + ' for object ' + o);
                 }
@@ -275,7 +275,7 @@ function createSetAttribute(o, name, type) {
 
 function createReference(o, name, desc) {
     Object.defineProperty(o, name,
-        { get: function() {return o.__meta__.references[name];}
+        { get: function() {return o.__jsmf__.references[name];}
         , set: function(xs) {
               xs = xs instanceof Array ? xs : [xs];
               var invalid = _.filter(xs, function(x) {
@@ -286,19 +286,19 @@ function createReference(o, name, desc) {
               if (!_.isEmpty(invalid)) {
                     throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);
               }
-              o.__meta__.associated[name] = [];
+              o.__jsmf__.associated[name] = [];
               if (desc.opposite !== undefined) {
                   var removed = _.difference(o[name], xs);
                   _.forEach(removed, function(y) {
-                      _.remove(y.__meta__.references[desc.opposite],
+                      _.remove(y.__jsmf__.references[desc.opposite],
                                function(z) {return z === o});
                   });
                   var added = _.difference(xs, o[name]);
                   _.forEach(added, function(y) {
-                      y.__meta__.references[desc.opposite].push(o);
+                      y.__jsmf__.references[desc.opposite].push(o);
                   });
               }
-              o.__meta__.references[name] = xs;
+              o.__jsmf__.references[name] = xs;
           }
         , enumerable: true
         });
@@ -309,12 +309,12 @@ function createAddReference(o, name, desc) {
     Object.defineProperty(o, addName(name),
         { value: function(xs, associated) {
             xs = xs instanceof Array ? xs : [xs];
-            var associationMap = o.__meta__.associated;
+            var associationMap = o.__jsmf__.associated;
             var backup = associationMap[name];
-            o.__meta__.references[name] = o[name].concat(xs);
+            o.__jsmf__.references[name] = o[name].concat(xs);
             if (desc.opposite !== undefined) {
                   _.forEach(xs, function(y) {
-                      y.__meta__.references[desc.opposite].push(o);
+                      y.__jsmf__.references[desc.opposite].push(o);
                   });
             }
             associationMap[name] = backup;
@@ -327,7 +327,7 @@ function createAddReference(o, name, desc) {
                 _.forEach(xs, function(x) {
                     associationMap[name].push({elem: x, associated: associated});
                     if (desc.opposite !== undefined) {
-                        x.__meta__.associated[desc.opposite].push({elem: o, associated: associated});
+                        x.__jsmf__.associated[desc.opposite].push({elem: o, associated: associated});
                     }
                 });
             }
@@ -340,9 +340,9 @@ function createRemoveReference(o, name, desc) {
     Object.defineProperty(o, removeName(name),
         { value: function(xs) {
             xs = xs instanceof Array ? xs : [xs];
-            var associationMap = o.__meta__.associated;
+            var associationMap = o.__jsmf__.associated;
             associationMap[name] = _.differenceWith(associationMap[name], xs, function(x,y) {x.elem === y});
-            o.__meta__.references[name] = _.difference(o.__meta__.references[name], xs);
+            o.__jsmf__.references[name] = _.difference(o.__jsmf__.references[name], xs);
             }
         , enumerable: false
         });

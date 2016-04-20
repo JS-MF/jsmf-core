@@ -70,6 +70,26 @@ Model.prototype.setModellingElements = Model.prototype.addModellingElement;
 Model.prototype.add = Model.prototype.addModellingElement;
 Model.prototype.setReferenceModel = function(rm) { this.referenceModel = rm; }
 
+Model.prototype.elements = function() {
+    return _.flatten(_.values(this.modellingElements));
+}
+
+Model.prototype.crop = function() {
+    var elements = this.elements();
+    _.forEach(elements, function(e) {
+        var mme = e.conformsTo();
+        if (mme !== undefined) {
+            for (var refName in mme.references) {
+                e.__jsmf__.references[refName] = _.intersection(e.__jsmf__.references, elements);
+                e.__jsmf__.associated[refName] = _.filter(e.__jsmf__.associated[refName], function(x) {
+                    return _.includes(e.__jsmf__.references[refName], x.elem);
+                });
+            }
+        }
+    })
+}
+
+
 function crawlElements(init) {
     var visited = [];
     var toVisit = init;

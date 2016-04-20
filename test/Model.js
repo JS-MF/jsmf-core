@@ -70,4 +70,52 @@ describe('Model', function() {
         });
 
     });
+
+    describe('elements', function() {
+        it('lists all the elements of the model', function(done) {
+            var A = new Class('A');
+            var B = new Class('B');
+            A.addReference('b', B);
+            var a = new A();
+            var b = new B();
+            a.b = b;
+            var M = new Model('Bar', {}, [a, b], true);
+            var elements = M.elements();
+            elements.should.have.length(2);
+            elements.should.containEql(a);
+            elements.should.containEql(b);
+            done();
+        });
+    });
+
+    describe('crop', function() {
+
+        it('remove references to elements that are not in the model', function(done) {
+            var A = new Class('A');
+            var B = new Class('B');
+            A.addReference('b', B);
+            var a = new A();
+            var b = new B();
+            a.b = b;
+            var M = new Model('Bar', {}, [a], true);
+            M.crop();
+            a.b.should.be.empty();
+            done();
+        });
+
+        it('remove references to elements that are not in the model', function(done) {
+            var A = new Class('A');
+            var B = new Class('B');
+            A.addReference('b', B, 1, 'back', 1, A);
+            var a = new A();
+            var b = new B();
+            a.addB(b, a);
+            var M = new Model('Bar', {}, [a], true);
+            M.crop();
+            a.b.should.be.empty();
+            a.getAssociated().b.should.be.empty();
+            done();
+        });
+
+    });
 })

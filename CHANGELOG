@@ -1,0 +1,20 @@
+0.5.0:
+
+    Model:
+    - Add an `elements` functions: list the modelling elements of the model
+      whatever their classes are.
+    - Add a `crop` function: removes refer4ences to elements that are not
+      into the model.
+
+0.4.0:
+
+    Features:
+    - Inline object definition
+    - Custom types for attributes
+    - Minimal Cardinality
+    - Can use javascript assignation to set references
+    - Can assign opposite reference directly
+    - Can remove elements from references
+
+    Internal:
+    - Change JSMF objects internal representations

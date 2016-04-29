@@ -5,183 +5,11 @@ Class = JSMF.Class;
 Model = JSMF.Model;
 Enum = JSMF.Enum;
 
-// ******************************
-// Check M2 Level Instanciation
-// ******************************
-//2 ways of creating a JSMF Class and check conformance relation
-describe('Create Class', function() {
+/*
 
-    describe('NewInstanceMode', function(){
-        it('Instance Created', function(done) {
-            var Instance = Class.newInstance('Instance');
-            Instance.__name.should.equal('Instance');
-            done();
-        })
-
-        it('Instance ConformsTo Class', function(done) {
-            var Instance = Class.newInstance('Instance');
-            Instance.conformsTo().should.equal(Class);
-            done();
-        })
-
-        it('Instance Created using Old Fashion', function(done) {
-            var InstanceOld = new Class('InstanceOld');
-            InstanceOld.__name.should.equal('InstanceOld');
-            done();
-        })
-    })
-
-    describe('Inheritance', function(){
-        it('Inheritance level 1 Created', function(done) {
-            var Instance = new Class('Instance');
-            var SuperInstance = Class.newInstance('SuperInstance');
-            var NonRelatedInstance = Class.newInstance('NonRelatedInstance');
-            Instance.setSuperType(SuperInstance);
-            Instance.__superType.should.have.keys('SuperInstance');
-            Instance.__superType.should.not.have.keys('NonRelatedInstance');
-            Instance.__superType['SuperInstance'].should.equal(SuperInstance);
-            done();
-        })
-
-        it('Inheritance level 2 Created', function(done) {
-            var Instance = new Class('Instance');
-            var SuperInstance = Class.newInstance('SuperInstance');
-            var SuperSuperInstance = Class.newInstance('SuperSuperInstance');
-            Instance.setSuperType(SuperInstance);
-            SuperInstance.setSuperType(SuperSuperInstance);
-            Instance.__superType.should.have.keys('SuperInstance');
-            Instance.__superType.should.not.have.keys('SuperSuperInstance');
-            Instance.__superType['SuperInstance'].should.equal(SuperInstance);
-            SuperInstance.__superType.should.have.keys('SuperSuperInstance');
-            SuperInstance.__superType.should.not.have.keys('SuperInstance');
-            done();
-        })
-
-        it('Inheritance multiple levels', function(done) {
-            var Instance = new Class('Instance');
-            var SuperInstance = Class.newInstance('SuperInstance');
-            var OtherSuperInstance = Class.newInstance('OtherSuperInstance');
-            Instance.setSuperType(SuperInstance);
-            Instance.setSuperType(OtherSuperInstance);
-            Instance.__superType.should.have.keys('SuperInstance','OtherSuperInstance');
-            //Instance.__superType.should.have.keys('SuperInstance');
-            Instance.__superType['SuperInstance'].should.equal(SuperInstance);
-            Instance.__superType['OtherSuperInstance'].should.equal(OtherSuperInstance);
-            //Instance.__superType.should.have.properties('SuperInstance',SuperInstance);
-            done();
-        })
-    })
-})
 
 // Create Attributes and check types, values
 describe('Create Class Elements', function() {
-    describe('Create Attribute', function() {
-        it('Attributes Created With primitve types', function(done){
-            var State = Class.newInstance('State');
-            State.__attributes.should.be.empty;
-            State.setAttribute('name', String);
-            State.setAttribute('id', Number);
-            State.setAttribute('active', Boolean);
-
-            State.__attributes.should.not.be.empty;
-
-            State.__attributes.should.have.property('name',String);
-            State.__attributes.should.have.property('id',Number);
-            State.__attributes.should.have.property('active',Boolean);
-
-            State.__attributes['name'].should.equal(String);
-            State.__attributes['id'].should.equal(Number);
-            State.__attributes['active'].should.equal(Boolean);
-            done();
-        })
-    })
-
-    describe('Create References', function() {
-        it('Simple cardinalty (0..1) reference created', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            State.setReference('transition', Transition,1);
-            State.__references.should.not.be.empty
-            State.__references.should.have.keys('transition');
-            State.__references['transition'].should.have.property('card',1);
-            State.__references['transition'].type.should.equal(Transition);
-            done();
-        })
-
-        it('Multiple cardinality (0..n) reference created', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            State.setReference('transition', Transition,-1);
-            State.__references.should.not.be.empty
-            State.__references.should.have.keys('transition');
-            State.__references['transition'].type.should.equal(Transition);
-            State.__references['transition'].should.have.property('card',-1);
-            done();
-        })
-
-        it('Array of Target class (0..n) reference created', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            var Association = Class.newInstance('Association');
-            State.setReference('transition', [Association,Transition],-1);
-            State.__references.should.not.be.empty
-            State.__references.should.have.keys('transition');
-            var resultArray = [Association,Transition];
-            State.__references['transition'].type.should.containDeep(resultArray);
-            State.__references['transition'].card.should.equal(-1);
-            done();
-        })
-
-        it('Opposite (0..n) reference created', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            State.setReference('transition', Transition,-1, 'source');
-            Transition.setReference('source', State, 1, 'transition');
-
-            State.__references.should.not.be.empty
-            State.__references.should.have.keys('transition');
-            State.__references['transition'].type.should.equal(Transition);
-            State.__references['transition'].should.have.property('card',-1);
-            State.__references['transition'].should.have.property('opposite','source');
-
-            Transition.__references.should.not.be.empty
-            Transition.__references.should.have.keys('source');
-            Transition.__references['source'].type.should.equal(State);
-            Transition.__references['source'].should.have.property('card',1);
-            Transition.__references['source'].should.have.property('opposite','transition');
-
-            done();
-        })
-
-        it('Any (0..n) reference created', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            State.setReference('transition', Class,-1);
-            State.__references.should.not.be.empty
-            State.__references['transition'].type.should.equal(Class);
-            done();
-        })
-    })
-
-    describe('Inheritance tests', function() {
-        it('Attributes', function(done){
-            var State = Class.newInstance('State');
-            State.setAttribute('name', String);
-            State.setAttribute('id', Number);
-            //State.setAttribute('active', Boolean);
-            var SuperState = Class.newInstance('SuperState');
-            SuperState.setAttribute('id', String);
-            SuperState.setAttribute('active', Boolean);
-            State.setSuperType(SuperState);
-            State.__attributes.should.have.property('name',String);
-            State.__attributes.should.have.property('id',Number);
-            State.__attributes.should.not.have.property('active',Boolean); //Indeed attribute is given by superType
-            State.__superType.should.be.ok; //have.property('id',String);
-            State.__superType['SuperState'].should.equal(SuperState);
-            done();
-        })
-    })
-})
 
 // ******************************
 // Check M1 Level Instanciation
@@ -191,21 +19,21 @@ describe('Create Class Elements', function() {
 describe('Create Class Instances', function() {
     describe('Create Instances (Attributes)', function() {
         it('creates instances conforms to Meta Element', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             var s1 = State.newInstance('s1');
             s1.conformsTo().should.equal(State);
             done();
         })
 
         it('creates instances with an id (uuid)', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             var s1 = State.newInstance('s1');
             s1.__jsmfId.should.not.equal(undefined);
             done();
         })
 
         it('Instance Created with Attributes and values', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setAttribute('id', Number);
             var s1 = State.newInstance('s1');
@@ -234,11 +62,11 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with inherited Attributes', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setAttribute('id', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('active', Boolean);
 
             State.setSuperType(SuperState);
@@ -272,11 +100,11 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with simple inheritance chain (inherited Attributes)', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setAttribute('id', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('id', String);
             SuperState.setAttribute('active', Boolean);
             State.setSuperType(SuperState);
@@ -326,15 +154,15 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with multiple inheritance (inherited Attributes)', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setAttribute('id', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('id', String);
             SuperState.setAttribute('active', Boolean);
 
-            var OtherSuperState = Class.newInstance('OtherSuperState');
+            var OtherSuperState = new Class('OtherSuperState');
             OtherSuperState.setAttribute('isnew', Boolean);
 
             State.setSuperType(SuperState);
@@ -378,14 +206,14 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with simple inheritance chain', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setAttribute('id', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('active', Boolean);
 
-            var SuperSuperState = Class.newInstance('SuperSuperState');
+            var SuperSuperState = new Class('SuperSuperState');
             SuperSuperState.setAttribute('blink', Number);
 
             SuperState.setSuperType(SuperSuperState);
@@ -402,14 +230,14 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with inheritance chain, attribute overriding (multiple times - each level keep its own definition) ', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('id', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('active', Boolean);
             SuperState.setAttribute('id', String);
 
-            var SuperSuperState = Class.newInstance('SuperSuperState');
+            var SuperSuperState = new Class('SuperSuperState');
             SuperSuperState.setAttribute('id', Boolean);
 
             State.setSuperType(SuperState);
@@ -492,13 +320,13 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with multiple inheritance using the last superclass attribute', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', Number);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setAttribute('id', String);
 
-            var OtherSuperState = Class.newInstance('OtherSuperState');
+            var OtherSuperState = new Class('OtherSuperState');
             OtherSuperState.setAttribute('id', Boolean);
 
             State.setSuperType(SuperState);
@@ -535,8 +363,8 @@ describe('Create Class Instances', function() {
 
     describe('Create Instances (References)', function() {
         it('Instance Created with simple references', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, 1);
 
 
@@ -559,8 +387,8 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created with 0..1 reference and cannot assign more than one target', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, 1);
 
             s1 = State.newInstance();
@@ -584,8 +412,8 @@ describe('Create Class Instances', function() {
         })
 
          it('Instance Created with multiple cardinality reference (0..*)', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, -1);
 
             s1 = State.newInstance();
@@ -616,9 +444,9 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created trying to assign wrong Class type and correct  Class type: only correct Class type are assigned', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            var FalseTransition = Class.newInstance('FalseTransition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
+            var FalseTransition = new Class('FalseTransition');
             State.setReference('transition', Transition, -1);
 
             s1 = State.newInstance();
@@ -652,9 +480,9 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance Created : with assignation of a child class to a reference only correct Class type are assigned', function(done){
-            var Basket = Class.newInstance('Basket');
-            var Fruit = Class.newInstance('Fruit');
-            var Banana = Class.newInstance('Banana');
+            var Basket = new Class('Basket');
+            var Fruit = new Class('Fruit');
+            var Banana = new Class('Banana');
             Banana.setSuperType(Fruit);
             Basket.setReference('fruit', Fruit, -1);
 
@@ -677,8 +505,8 @@ describe('Create Class Instances', function() {
             done();
         })
         it('Instance created trying to assign multiple time the same model element (JS reference) to a reference', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             Transition.setAttribute('name', String);
             State.setReference('transition', Transition, -1);
 
@@ -706,8 +534,8 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance created assigning similar model element but a different instance to a reference', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             Transition.setAttribute('name', String);
             State.setReference('transition', Transition, -1);
 
@@ -738,8 +566,8 @@ describe('Create Class Instances', function() {
         })
 
         it('Instance created with several references added at the same time', function(done){
-            State = Class.newInstance('State');
-            Transition = Class.newInstance('Transition');
+            State = new Class('State');
+            Transition = new Class('Transition');
             Transition.setAttribute('name', String);
             State.setReference('transition', Transition, -1);
 
@@ -765,8 +593,8 @@ describe('Create Class Instances', function() {
         });
 
          it('Instance Created with circular (non-opposite) References', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, -1);
             Transition.setReference('source', State, 1);
 
@@ -798,8 +626,8 @@ describe('Create Class Instances', function() {
 
          //Opposite!
          it('Instance Created with simple opposite relations', function(done){
-            State = Class.newInstance('State');
-            Transition = Class.newInstance('Transition');
+            State = new Class('State');
+            Transition = new Class('Transition');
             State.setReference('transition', Transition, -1, 'source');
             Transition.setReference('source', State, 1, 'transition'); //'transition'
 
@@ -836,8 +664,8 @@ describe('Create Class Instances', function() {
         })
 
          it('Opposite relations are not added if direct relation fails', function(done){
-            State = Class.newInstance('State');
-            Transition = Class.newInstance('Transition');
+            State = new Class('State');
+            Transition = new Class('Transition');
             State.setReference('transition', Transition, -1, 'source');
             Transition.setReference('source', State, 1, 'transition'); //'transition'
 
@@ -858,13 +686,13 @@ describe('Create Class Instances', function() {
 
 
          it('Instances created with simple inherited Reference', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            var SuperTransition = Class.newInstance('SuperTransition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
+            var SuperTransition = new Class('SuperTransition');
 
             State.setReference('transition', Transition, -1);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setReference('supertransition', SuperTransition,-1);
 
             State.setSuperType(SuperState);
@@ -893,13 +721,13 @@ describe('Create Class Instances', function() {
 
 
         it('Instances created with overriden inherited Reference', function(done){
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            var SuperTransition = Class.newInstance('SuperTransition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
+            var SuperTransition = new Class('SuperTransition');
 
             State.setReference('transition', Transition, -1);
 
-            var SuperState = Class.newInstance('SuperState');
+            var SuperState = new Class('SuperState');
             SuperState.setReference('transition', SuperTransition, -1);
 
             State.setSuperType(SuperState);
@@ -931,9 +759,9 @@ describe('Create Class Instances', function() {
 
 
         it('Instance created with reference to an inhereted class', function(done) { //Alain's reported bug
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
-            var SubState = Class.newInstance('SubState');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
+            var SubState = new Class('SubState');
 
             SubState.setSuperType(State);
 
@@ -949,7 +777,7 @@ describe('Create Class Instances', function() {
         });
 
         it('Instances created with multiple inherented references', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
 
             done();
         });
@@ -957,15 +785,15 @@ describe('Create Class Instances', function() {
     });
     describe("Create instance (initialisation)", function () {
         it("Allows attribute initialisation", function (done) {
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             var s0 = State.newInstance({name: "s0"});
             s0['name'].should.be.equal("s0");
             done();
         });
         it("Allows reference initialisation", function (done) {
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, -1);
             var t0 = Transition.newInstance();
             var t1 = Transition.newInstance();
@@ -976,7 +804,7 @@ describe('Create Class Instances', function() {
             done();
         });
         it("Does nothing with unknown properties", function (done) {
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             State.setAttribute('name', String);
             State.setReference('foo', State, -1);
             var s0 = State.newInstance({bar: 42});
@@ -989,9 +817,10 @@ describe('Create Class Instances', function() {
 // ************************************************************
 //    Test Enumerations
 // ************************************************************/
+/*
 describe('Create Enumeration', function() {
         it('Instance Created with enumerated value', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
 
             var E1 = new Enum('IType');
             E1.setLiteral('v1',0);
@@ -1009,7 +838,7 @@ describe('Create Enumeration', function() {
             done();
     });
         it('Instance Created with inline enumerated values', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
 
             var E1 = new Enum('IType', {v1: 0, v2: 2});
 
@@ -1026,7 +855,7 @@ describe('Create Enumeration', function() {
     });
 
     it('Instance Created with incorrect enumerated value', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
 
             var E1 = new Enum('IType');
             E1.setLiteral('v1',0);
@@ -1045,7 +874,7 @@ describe('Create Enumeration', function() {
     });
 
     it('esolve instance values', function(done){
-            var State = Class.newInstance('State');
+            var State = new Class('State');
 
             var E1 = new Enum('IType');
             E1.setLiteral('v1',0);
@@ -1057,15 +886,18 @@ describe('Create Enumeration', function() {
             done();
     });
 });
+*/
 /**********************************************************
 // Model/Metamodel (aka package/namespace) Creation
 ***********************************************************/
+
+/*
 describe('Create a Model (Namespace/Package)', function() {
     describe('MetaModel - Reference Model',function() {
         it('Metamodel Created with one Meta element inside', function(done) {
 
             var ReferenceModel = new Model("Reference");
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             ReferenceModel.setModellingElement(State);
             ReferenceModel.modellingElements.should.have.keys('State');
             ReferenceModel.modellingElements['State'][0].should.be.equal(State);
@@ -1076,7 +908,7 @@ describe('Create a Model (Namespace/Package)', function() {
         it('Metamodel Created with one Meta element inside', function(done) {
 
             var ReferenceModel = new Model("Reference");
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             ReferenceModel.setModellingElement(State);
             ReferenceModel.modellingElements.should.have.keys('State');
             ReferenceModel.modellingElements.should.have.property('State',[State]);
@@ -1089,7 +921,7 @@ describe('Create a Model (Namespace/Package)', function() {
          it('Metamodel Created and Model Associated with corresponding Instances', function(done) {
 
             var ReferenceModel = new Model('Reference');
-            var State = Class.newInstance('State');
+            var State = new Class('State');
             ReferenceModel.setModellingElement(State);
             ReferenceModel.modellingElements['State'][0].should.be.equal(State);
 
@@ -1108,8 +940,8 @@ describe('Create a Model (Namespace/Package)', function() {
             })
 
         it("Add elements to the model recursively", function (done) {
-            var State = Class.newInstance('State');
-            var Transition = Class.newInstance('Transition');
+            var State = new Class('State');
+            var Transition = new Class('Transition');
             State.setReference('transition', Transition, -1);
             var t0 = Transition.newInstance();
             var t1 = Transition.newInstance();
@@ -1123,3 +955,4 @@ describe('Create a Model (Namespace/Package)', function() {
         });
     })
 })
+*/

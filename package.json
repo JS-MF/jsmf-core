@@ -26,7 +26,6 @@
   "license": "MIT",
   "dependencies": {
     "lodash": "~4.1.0",
-    "mocha": "^2.4.5",
     "uuid": "~2.0.1"
   },
   "devDependencies": {

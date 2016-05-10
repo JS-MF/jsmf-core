@@ -9,16 +9,12 @@ Authors : J.S. Sottet, A. Vagner, N. Biri
 */
 'use strict';
 
-var _ = require('lodash');
-var uuid = require('uuid');
+const _ = require('lodash')
+const uuid = require('uuid')
 
-var Type = require('./Type');
-var conformsTo;
-(function() {
-    var common = require('./Common');
-    conformsTo = common.conformsTo;
-}).call();
-var Cardinality = require('./Cardinality').Cardinality
+const Type = require('./Type')
+const conformsTo = require('./Common').conformsTo
+const Cardinality = require('./Cardinality').Cardinality
 
 
 /** 
@@ -43,25 +39,23 @@ var Cardinality = require('./Cardinality').Cardinality
  */
 function Class(name, superClasses, attributes, references) {
     function jsmfElement(attr) {
-        var o = this;
+        const o = this
         Object.defineProperties(o,
             { __jsmf__: {value: elementMeta(jsmfElement)}
-            , conformsTo: {value: function() {return conformsTo(o);}}
+            , conformsTo: {value: () => conformsTo(o)}
             , getAssociated: {value: getAssociated, enumerable: false}
             });
-        createAttributes(o, jsmfElement);
-        createReferences(o, jsmfElement);
-        _.forEach(attr, function(v,k) {
-            o[k] = v;
-        });
+        createAttributes(o, jsmfElement)
+        createReferences(o, jsmfElement)
+        _.forEach(attr, (v,k) => o[k] = v)
     }
-    superClasses = superClasses || [];
-    jsmfElement.__name = name;
-    jsmfElement.superClasses = superClasses instanceof Array ? superClasses : [superClasses];
-    jsmfElement.attributes = {};
-    jsmfElement.references = {};
-    Object.defineProperty(jsmfElement, '__jsmf__', {value: classMeta()});
-    populateClassFunction(jsmfElement);
+    superClasses = superClasses || []
+    jsmfElement.__name = name
+    jsmfElement.superClasses = superClasses instanceof Array ? superClasses : [superClasses]
+    jsmfElement.attributes = {}
+    jsmfElement.references = {}
+    Object.defineProperty(jsmfElement, '__jsmf__', {value: classMeta()})
+    populateClassFunction(jsmfElement)
     if (attributes !== undefined) { jsmfElement.addAttributes(attributes)}
     if (references !== undefined) { jsmfElement.addReferences(references)}
     return jsmfElement;
@@ -78,23 +72,23 @@ Class.newInstance = function(name, superClasses, attributes, references) {
 function checkCardinality(elem) {
     var context = {toVisit: [elem], visited: [], errors: []};
     while (context.toVisit.length > 0) {
-        var e = context.toVisit.pop();
-        context.visited.push(e);
-        var c = conformsTo(e);
+        const element = context.toVisit.pop()
+        const c = conformsTo(element)
+        context.visited.push(element)
         if (c !== undefined) {
-            _.forEach(c.allReferences(), function(desc, r) {
-                var min = _.get(desc, ['cardinality', 'min'], 0);
-                var max = _.get(desc, ['cardinality', 'max'], undefined);
-                var length = e[r].length
+            _.forEach(c.allReferences(), (desc, reference) => {
+                const min = _.get(desc, ['cardinality', 'min'], 0);
+                const max = _.get(desc, ['cardinality', 'max'], undefined);
+                const length = element[reference].length
                 if ((max !== undefined && length > max) || length < min) {
-                    context.errors.push({element: e, reference: r, length: length, expected: desc.cardinality});
+                    context.errors.push({element, reference, length, expected: desc.cardinality});
                 }
-                _.forEach(e[r], function (v) {
+                _.forEach(e[r], v => {
                     if (!_.includes(context.visited, v)) {
                         context.visited.push(v);
                     }
-                });
-            });
+                })
+            })
         }
     }
     return context.errors;
@@ -103,13 +97,13 @@ function checkCardinality(elem) {
 /** Return true if the given object is a JSMF Class.
  */
 function isJSMFClass(o) {
-    return conformsTo(o) === Class;
+    return conformsTo(o) === Class
 }
 
 
 function getInheritanceChain() {
     return _.reduce( this.superClasses.reverse()
-        , function (acc, v) {return v.getInheritanceChain().concat(acc);}
+        , (acc, v) => v.getInheritanceChain().concat(acc)
         , [this]
         );
 }
@@ -117,58 +111,52 @@ function getInheritanceChain() {
 function getAllReferences() {
     return _.reduce(
         this.getInheritanceChain(),
-        function (acc, cls) {
-            return _.reduce(
-                cls.references,
-                function (acc2, v, k) { acc2[k] = v; return acc2; },
-                acc);
-        },
-        {});
+        (acc, cls) => _.reduce(cls.references, (acc2, v, k) => {acc2[k] = v; return acc2}, acc),
+        {})
 }
 
 function getAssociated(name) {
     if (name === undefined) {
-        return _.get(this, ['__jsmf__', 'associated']);
+        return _.get(this, ['__jsmf__', 'associated'])
     } else {
-        return _.get(this, ['__jsmf__', 'associated', name]);
+        return _.get(this, ['__jsmf__', 'associated', name])
     }
 }
 
 function addReferences(descriptors) {
-    var self = this;
-    _.forEach(descriptors, function (desc, k) {
-        self.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated);
-    });
+    const self = this;
+    _.forEach(descriptors, (desc, k) =>
+        self.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated))
 }
 
 function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated) {
     this.references[name] = { type: target || Type.JSMFAny
                             , cardinality: Cardinality.check(sourceCardinality)
-                            };
+                            }
     if (opposite !== undefined) {
-        this.references[name].opposite = opposite;
+        this.references[name].opposite = opposite
         target.references[opposite] =
             { type: this
             , cardinality: Cardinality.check(oppositeCardinality)
             , opposite: name
-            };
+            }
     }
     if (associated !== undefined) {
-        this.references[name].associated = associated;
+        this.references[name].associated = associated
         if (opposite !== undefined) {
-            target.references[opposite].associated = associated;
+            target.references[opposite].associated = associated
         }
     }
 }
 
 function removeReference(name, opposite) {
-    var ref = this.references[name];
+    const ref = this.references[name]
     _.unset(this.references, name);
     if (ref.opposite !== undefined) {
         if (opposite) {
-            _.unset(ref.type.references, ref.opposite);
+            _.unset(ref.type.references, ref.opposite)
         } else {
-            _.unset(ref.type.references[ref.opposite], 'opposite');
+            _.unset(ref.type.references[ref.opposite], 'opposite')
         }
     }
 }
@@ -176,12 +164,7 @@ function removeReference(name, opposite) {
 function getAllAttributes() {
     return _.reduce(
         this.getInheritanceChain(),
-        function (acc, cls) {
-            return _.reduce(
-                cls.attributes,
-                function (acc2, v, k) { acc2[k] = v; return acc2; },
-                acc);
-        },
+        (acc, cls) => _.reduce(cls.attributes, (acc2, v, k) => {acc2[k] = v; return acc2}, acc),
         {});
 }
 
@@ -209,50 +192,50 @@ function populateClassFunction(cls) {
 }
 
 function setSuperType(s) {
-    var self = this;
-    var ss = s instanceof Array ? s : [s];
-    _.forEach(ss, function(cls) {
+    const self = this;
+    const ss = s instanceof Array ? s : [s];
+    _.forEach(ss, cls => {
         if (!_.includes(self.superClasses, cls)) {
-            self.superClasses.push(s);
+            self.superClasses.push(cls)
         }
-    });
+    })
 }
 
 function addAttribute(name, type) {
-  this.attributes[name] = Type.normalizeType(type);
+  this.attributes[name] = Type.normalizeType(type)
 }
 
 function removeAttribute(name) {
-  _.unset(this.attributes, name);
+  _.unset(this.attributes, name)
 }
 
 function addAttributes(attrs) {
-  var self = this;
-  _.forEach(attrs, function(v, k) {self.addAttribute(k, v);});
+  const self = this
+  _.forEach(attrs, (v, k) => {self.addAttribute(k, v)})
 }
 
 
 function createAttributes(e, cls) {
-    _.forEach(cls.getAllAttributes(), function(type, name) {
-        e.__jsmf__.attributes[name] = undefined;
-        createAttribute(e, name, type);
-    });
+    _.forEach(cls.getAllAttributes(), (type, name) => {
+        e.__jsmf__.attributes[name] = undefined
+        createAttribute(e, name, type)
+    })
 }
 
 function createReferences(e, cls) {
-    _.forEach(cls.getAllReferences(), function(desc, name) {
-        e.__jsmf__.associated[name] = [];
-        e.__jsmf__.references[name] = [];
-        createAddReference(e, name, desc);
-        createRemoveReference(e, name);
-        createReference(e, name, desc);
-    });
+    _.forEach(cls.getAllReferences(), (desc, name) => {
+        e.__jsmf__.associated[name] = []
+        e.__jsmf__.references[name] = []
+        createAddReference(e, name, desc)
+        createRemoveReference(e, name)
+        createReference(e, name, desc)
+    })
 }
 
 function createAttribute(o, name, type) {
     createSetAttribute(o,name, type)
     Object.defineProperty(o, name,
-        { get: function() {return o.__jsmf__.attributes[name];}
+        { get: () => o.__jsmf__.attributes[name]
         , set: o[setName(name)]
         , enumerable: true
         }
@@ -261,11 +244,11 @@ function createAttribute(o, name, type) {
 
 function createSetAttribute(o, name, type) {
     Object.defineProperty(o, setName(name),
-        {value: function(x) {
+        {value: x => {
                 if (type(x)) {
                     o.__jsmf__.attributes[name] = x;
                 } else {
-                    throw new TypeError('Invalid assignment: ' + x + ' for object ' + o);
+                    throw new TypeError(`Invalid assignment: ${x} for object ${o}`);
                 }
             }
         , enumerable: false
@@ -275,28 +258,25 @@ function createSetAttribute(o, name, type) {
 
 function createReference(o, name, desc) {
     Object.defineProperty(o, name,
-        { get: function() {return o.__jsmf__.references[name];}
-        , set: function(xs) {
+        { get: () => o.__jsmf__.references[name]
+        , set: xs => {
               xs = xs instanceof Array ? xs : [xs];
-              var invalid = _.filter(xs, function(x) {
-                  var type = conformsTo(x);
+              const invalid = _.filter(xs, x => {
+                  const type = conformsTo(x)
                   return type === undefined
-                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Type.JSMFAny));
+                            || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Type.JSMFAny))
               });
               if (!_.isEmpty(invalid)) {
-                    throw new TypeError('Invalid assignment: ' + invalid + ' for object ' + o);
+                    throw new TypeError(`Invalid assignment: ${invalid} for object ${o}`);
               }
               o.__jsmf__.associated[name] = [];
               if (desc.opposite !== undefined) {
-                  var removed = _.difference(o[name], xs);
+                  const removed = _.difference(o[name], xs)
                   _.forEach(removed, function(y) {
-                      _.remove(y.__jsmf__.references[desc.opposite],
-                               function(z) {return z === o});
+                      _.remove(y.__jsmf__.references[desc.opposite], z => z === o)
                   });
-                  var added = _.difference(xs, o[name]);
-                  _.forEach(added, function(y) {
-                      y.__jsmf__.references[desc.opposite].push(o);
-                  });
+                  const added = _.difference(xs, o[name]);
+                  _.forEach(added, y => y.__jsmf__.references[desc.opposite].push(o))
               }
               o.__jsmf__.references[name] = xs;
           }
@@ -308,26 +288,24 @@ function createReference(o, name, desc) {
 function createAddReference(o, name, desc) {
     Object.defineProperty(o, addName(name),
         { value: function(xs, associated) {
-            xs = xs instanceof Array ? xs : [xs];
-            var associationMap = o.__jsmf__.associated;
-            var backup = associationMap[name];
-            o.__jsmf__.references[name] = o[name].concat(xs);
+            xs = xs instanceof Array ? xs : [xs]
+            const associationMap = o.__jsmf__.associated
+            const backup = associationMap[name]
+            o.__jsmf__.references[name] = o[name].concat(xs)
             if (desc.opposite !== undefined) {
-                  _.forEach(xs, function(y) {
-                      y.__jsmf__.references[desc.opposite].push(o);
-                  });
+                  _.forEach(xs, y => y.__jsmf__.references[desc.opposite].push(o))
             }
             associationMap[name] = backup;
             if (associated !== undefined) {
                 associationMap[name] = associationMap[name] || [];
                 if (desc.associated !== undefined
                   && !_.includes(associated.conformsTo().getInheritanceChain(), desc.associated)) {
-                    throw new Error('Invalid association ' + associated + ' for object' + o)
+                    throw new Error(`Invalid association ${associated} for object ${o}`)
                 }
-                _.forEach(xs, function(x) {
-                    associationMap[name].push({elem: x, associated: associated});
+                _.forEach(xs, x => {
+                    associationMap[name].push({elem: x, associated});
                     if (desc.opposite !== undefined) {
-                        x.__jsmf__.associated[desc.opposite].push({elem: o, associated: associated});
+                        x.__jsmf__.associated[desc.opposite].push({elem: o, associated});
                     }
                 });
             }
@@ -338,11 +316,11 @@ function createAddReference(o, name, desc) {
 
 function createRemoveReference(o, name, desc) {
     Object.defineProperty(o, removeName(name),
-        { value: function(xs) {
-            xs = xs instanceof Array ? xs : [xs];
-            var associationMap = o.__jsmf__.associated;
-            associationMap[name] = _.differenceWith(associationMap[name], xs, function(x,y) {x.elem === y});
-            o.__jsmf__.references[name] = _.difference(o.__jsmf__.references[name], xs);
+        { value: xs => {
+            xs = xs instanceof Array ? xs : [xs]
+            const associationMap = o.__jsmf__.associated
+            associationMap[name] = _.differenceWith(associationMap[name], xs, (x,y) => x.elem === y)
+            o.__jsmf__.references[name] = _.difference(o.__jsmf__.references[name], xs)
             }
         , enumerable: false
         });
@@ -380,8 +358,4 @@ function prefixedName(pre, n) {
 }
 
 
-module.exports =
-    { Class: Class
-    , isJSMFClass: isJSMFClass
-    , checkCardinality: checkCardinality
-    }
+module.exports = { Class, isJSMFClass, checkCardinality }

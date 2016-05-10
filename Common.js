@@ -15,7 +15,7 @@ function isJSMFElement(o) {
 }
 
 module.exports =
-  { conformsTo: conformsTo
-  , jsmfId: jsmfId
-  , isJSMFElement: isJSMFElement
+  { conformsTo
+  , jsmfId
+  , isJSMFElement
   }

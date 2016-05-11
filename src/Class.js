@@ -131,9 +131,8 @@ function getAssociated(name) {
 }
 
 function addReferences(descriptors) {
-    const self = this;
     _.forEach(descriptors, (desc, k) =>
-        self.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated))
+        this.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated))
 }
 
 function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated) {
@@ -192,9 +191,8 @@ function populateClassFunction(cls) {
 }
 
 function setSuperType(s) {
-    const self = this;
     const ss = s instanceof Array ? s : [s];
-    self.superClasses = _.uniq(self.superClasses.concat(ss))
+    this.superClasses = _.uniq(this.superClasses.concat(ss))
 }
 
 function addAttribute(name, type) {
@@ -206,8 +204,7 @@ function removeAttribute(name) {
 }
 
 function addAttributes(attrs) {
-  const self = this
-  _.forEach(attrs, (v, k) => {self.addAttribute(k, v)})
+  _.forEach(attrs, (v, k) => this.addAttribute(k, v))
 }
 
 

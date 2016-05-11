@@ -21,8 +21,7 @@ function Model(name, referenceModel, modellingElements, transitive) {
         if (transitive) {
             this.modellingElements = crawlElements(modellingElements)
         } else {
-            const self = this
-            _.forEach(modellingElements, e => self.addModellingElement(e))
+            _.forEach(modellingElements, e => this.addModellingElement(e))
         }
     }
 }
@@ -36,14 +35,13 @@ function modelExport(m) {
 }
 
 Model.prototype.addModellingElement = function(es) {
-    const self = this
     es = es instanceof Array ? es : [es];
     _.forEach(es, e => {
-        if (!isJSMFElement(e)) {throw new TypeError(`can't Add ${e} to model ${self}`)}
+        if (!isJSMFElement(e)) {throw new TypeError(`can't Add ${e} to model ${this}`)}
         const key = (isJSMFClass(e) || isJSMFEnum(e)) ? e.__name : conformsTo(e).__name
-        const current = self.modellingElements[key] || []
+        const current = this.modellingElements[key] || []
         current.push(e)
-        self.modellingElements[key] = current
+        this.modellingElements[key] = current
     });
 }
 

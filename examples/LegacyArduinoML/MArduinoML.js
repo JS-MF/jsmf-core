@@ -4,7 +4,7 @@ var AML = require('./MMArduinoML.js')
 var Model;
 
 (function() {
-    var JSMF = require('../../index');
+    var JSMF = require('../../src/index');
     Model = JSMF.Model;
 }).call();
 

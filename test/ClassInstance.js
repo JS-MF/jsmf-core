@@ -1,7 +1,7 @@
 'use strict';
 
 var should = require('should');
-var JSMF = require('../index');
+var JSMF = require('../src/index');
 var Class = JSMF.Class;
 
 var State = new Class('State', [], {name: JSMF.String});

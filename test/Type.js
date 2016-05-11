@@ -1,7 +1,7 @@
 'use strict';
 
 var should = require('should');
-var JSMF = require('../index');
+var JSMF = require('../src/index');
 
 describe('JSMFAny', function() {
 

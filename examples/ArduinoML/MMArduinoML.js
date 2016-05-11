@@ -1,6 +1,6 @@
 'use strict';
 
-var JSMF = require('../../index');
+var JSMF = require('../../src/index');
 
 var Class, Model, Enum;
 

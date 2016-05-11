@@ -14,7 +14,7 @@ module.exports =
     , Array: _.isArray
     , Object: _.isObject
     , Range: function Range(min, max) {
-          const self = function jsmfRange(x) { return x >= min && x <= max }
+          const self = x => _.range(x, min, max)
           self.typeName = 'Range'
           self.min = min
           self.max = max

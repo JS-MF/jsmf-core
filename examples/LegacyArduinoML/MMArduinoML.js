@@ -4,7 +4,7 @@ var Class;
 var Model;
 var Enum;
 
-(function() {var JSMF = require('../../index');
+(function() {var JSMF = require('../../src/index');
     Model = JSMF.Model;
     Class = JSMF.Class;
     Enum = JSMF.Enum;

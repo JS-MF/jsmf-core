@@ -9,17 +9,16 @@ Authors : J.S. Sottet, N. Biri, A Vagner
 
 */
 
-'use strict';
+'use strict'
 
-var _ = require('lodash');
-var uuid = require('uuid');
+const _ = require('lodash')
 
-var Common = require('./Common');
-var Model = require('./Model');
-var Class = require('./Class');
-var Enum = require('./Enum');
-var Cardinality = require('./Cardinality');
-var Type = require('./Type');
+const Common = require('./Common')
+const Model = require('./Model')
+const Class = require('./Class')
+const Enum = require('./Enum')
+const Cardinality = require('./Cardinality')
+const Type = require('./Type')
 
 module.exports = _.assign(Common, Model, Class, Enum, Cardinality, Type);
 

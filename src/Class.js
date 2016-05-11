@@ -102,10 +102,9 @@ function isJSMFClass(o) {
 
 
 function getInheritanceChain() {
-    return _.reduce( this.superClasses.reverse()
-        , (acc, v) => v.getInheritanceChain().concat(acc)
-        , [this]
-        );
+    return _(this.superClasses).reverse().reduce(
+        (acc, v) => v.getInheritanceChain().concat(acc),
+        [this]);
 }
 
 function getAllReferences() {
@@ -114,6 +113,14 @@ function getAllReferences() {
         (acc, cls) => _.reduce(cls.references, (acc2, v, k) => {acc2[k] = v; return acc2}, acc),
         {})
 }
+
+function getAllAttributes() {
+    return _.reduce(
+        this.getInheritanceChain(),
+        (acc, cls) => _.reduce(cls.attributes, (acc2, v, k) => {acc2[k] = v; return acc2}, acc),
+        {});
+}
+
 
 function getAssociated(name) {
     if (name === undefined) {
@@ -151,7 +158,7 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
 
 function removeReference(name, opposite) {
     const ref = this.references[name]
-    _.unset(this.references, name);
+    _.unset(this.references, name)
     if (ref.opposite !== undefined) {
         if (opposite) {
             _.unset(ref.type.references, ref.opposite)
@@ -159,13 +166,6 @@ function removeReference(name, opposite) {
             _.unset(ref.type.references[ref.opposite], 'opposite')
         }
     }
-}
-
-function getAllAttributes() {
-    return _.reduce(
-        this.getInheritanceChain(),
-        (acc, cls) => _.reduce(cls.attributes, (acc2, v, k) => {acc2[k] = v; return acc2}, acc),
-        {});
 }
 
 function populateClassFunction(cls) {
@@ -194,11 +194,7 @@ function populateClassFunction(cls) {
 function setSuperType(s) {
     const self = this;
     const ss = s instanceof Array ? s : [s];
-    _.forEach(ss, cls => {
-        if (!_.includes(self.superClasses, cls)) {
-            self.superClasses.push(cls)
-        }
-    })
+    self.superClasses = _.uniq(self.superClasses.concat(ss))
 }
 
 function addAttribute(name, type) {
@@ -342,19 +338,19 @@ function elementMeta(constructor) {
 
 
 function addName(n) {
-    return prefixedName('add',n);
+    return prefixedName('add',n)
 }
 
 function setName(n) {
-    return prefixedName('set',n);
+    return prefixedName('set',n)
 }
 
 function removeName(n) {
-    return prefixedName('remove',n);
+    return prefixedName('remove',n)
 }
 
 function prefixedName(pre, n) {
-    return pre + n[0].toUpperCase() + n.slice(1);
+    return pre + n[0].toUpperCase() + n.slice(1)
 }
 
 

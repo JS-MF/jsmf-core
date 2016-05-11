@@ -2,8 +2,9 @@
 
 var should = require('should');
 var _ = require('lodash');
-var JSMF = require('../index');
+var JSMF = require('../src/index');
 var Model = JSMF.Model;
+var Class = JSMF.Class;
 
 describe('Model', function() {
 

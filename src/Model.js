@@ -19,10 +19,9 @@ function Model(name, referenceModel, modellingElements, transitive) {
     if (modellingElements !== undefined) {
         modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements]
         if (transitive) {
-            this.modellingElements = crawlElements(modellingElements)
-        } else {
-            _.forEach(modellingElements, e => this.addModellingElement(e))
+            modellingElements = crawlElements(modellingElements)
         }
+        _.forEach(modellingElements, e => this.addModellingElement(e))
     }
 }
 
@@ -73,8 +72,8 @@ Model.prototype.crop = function() {
 
 
 function crawlElements(init) {
-    const visited = [];
-    let toVisit = init;
+    const visited = []
+    let toVisit = init
     while (!_.isEmpty(toVisit)) {
         var e = toVisit.pop()
         if (!_.includes(visited, e)) {

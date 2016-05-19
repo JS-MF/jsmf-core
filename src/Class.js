@@ -132,10 +132,18 @@ function getAssociated(name) {
 
 function addReferences(descriptors) {
     _.forEach(descriptors, (desc, k) =>
-        this.addReference(k, desc.target || desc.type, desc.cardinality, desc.opposite, desc.oppositeCardinality, desc.associated))
+        this.addReference(
+          k,
+          desc.target || desc.type,
+          desc.cardinality,
+          desc.opposite,
+          desc.oppositeCardinality,
+          desc.associated,
+          desc.errorCallback)
+        )
 }
 
-function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated) {
+function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated, errorCallback) {
     this.references[name] = { type: target || Type.JSMFAny
                             , cardinality: Cardinality.check(sourceCardinality)
                             }
@@ -155,6 +163,7 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
             target.references[opposite].associated = associated
         }
     }
+    this.references[name].errorCallback = errorCallback || onError.throw
 }
 
 function removeReference(name, opposite) {
@@ -197,8 +206,12 @@ function setSuperType(s) {
     this.superClasses = _.uniq(this.superClasses.concat(ss))
 }
 
-function addAttribute(name, type, mandatory) {
-  this.attributes[name] = {type: Type.normalizeType(type), mandatory: mandatory || false}
+function addAttribute(name, type, mandatory, errorCallback) {
+  this.attributes[name] =
+    { type: Type.normalizeType(type)
+    , mandatory: mandatory || false
+    , errorCallback: errorCallback || onError.throw
+    }
 }
 
 function removeAttribute(name) {
@@ -208,7 +221,7 @@ function removeAttribute(name) {
 function addAttributes(attrs) {
   _.forEach(attrs, (v, k) => {
     if (v.type !== undefined) {
-      this.addAttribute(k, v.type, v.mandatory)
+      this.addAttribute(k, v.type, v.mandatory, v.errorCallback)
     } else {
       this.addAttribute(k, v)
     }
@@ -246,11 +259,10 @@ function createAttribute(o, name, desc) {
 function createSetAttribute(o, name, desc) {
     Object.defineProperty(o, setName(name),
         {value: x => {
-                if (desc.type(x) || (!desc.mandatory && (_.isNull(x) || _.isUndefined(x)))) {
-                    o.__jsmf__.attributes[name] = x;
-                } else {
-                    throw new TypeError(`Invalid assignment: ${x} for object ${o}`);
+                if (!desc.type(x) && (desc.mandatory || !_.isUndefined(x))) {
+                    desc.errorCallback(o, name, x)
                 }
+                o.__jsmf__.attributes[name] = x
             }
         , enumerable: false
         });
@@ -273,7 +285,7 @@ function createReference(o, name, desc) {
                             || !(_.includes(type.getInheritanceChain(), desc.type) || (desc.type === Type.JSMFAny))
               });
               if (!_.isEmpty(invalid)) {
-                    throw new TypeError(`Invalid assignment: ${invalid} for object ${o}`);
+                    desc.errorCallback(o, name, xs)
               }
               o.__jsmf__.associated[name] = [];
               if (desc.opposite !== undefined) {
@@ -363,5 +375,11 @@ function prefixedName(pre, n) {
     return pre + n[0].toUpperCase() + n.slice(1)
 }
 
+const onError =
+  { 'throw': (o,n,x) => {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
+  , 'log': (o,n,x) => {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
+  , 'silent': () => undefined
+  }
 
-module.exports = { Class, isJSMFClass, hasClass, checkCardinality }
+
+module.exports = { Class, isJSMFClass, hasClass, checkCardinality, onError }

@@ -10,6 +10,7 @@ let Class, hasClass
   hasClass = C.hasClass
 }).call()
 
+
 const Model = require('./Model').Model
 
 let isJSMFElement, conformsTo
@@ -57,7 +58,7 @@ const referencesTypeRule = new check.Rule(
         return this[0][this[1].name]
       }))
     ],
-    (e, r, v) => {try { return hasClass(v, r.type) } catch (err) { return false }}
+    (e, r, v) => {console.log(Class); try { return hasClass(v, r.type) } catch (err) { return false }}
 )
 
 const associatedTypeRule = new check.Rule(
@@ -107,4 +108,4 @@ conformance.helpers.elements = e => {
     throw new TypeError(`Invalid argument for conformance: ${e}`)
 }
 
-module.exports = Object.assign(conformance.rules, { conformance })
+module.exports = _.assign(conformance.rules, { conformance })

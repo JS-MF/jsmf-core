@@ -73,29 +73,31 @@ Model.prototype.crop = function() {
 
 
 function crawlElements(init) {
-    const visited = [];
-    let toVisit = init;
+    const visited = new Set()
+    let toVisit = init
     while (!_.isEmpty(toVisit)) {
         var e = toVisit.pop()
-        if (!_.includes(visited, e)) {
-            visited.push(e)
+        if (!visited.has(e)) {
+            visited.add(e)
             let newNodes
             if (isJSMFClass(e)) {
                 const refs = e.getAllReferences()
-                const refTypes = _.map(refs, v => v.type)
+                const refTypes = _.map(refs, 'type')
                 const attrs = e.getAllAttributes()
-                const attrsEnum = _(attrs).values().filter(isJSMFEnum).value()
+                const attrsEnum = _(attrs).values().map('type').filter(isJSMFEnum).value()
                 newNodes = _.flatten([refTypes, attrsEnum, e.getInheritanceChain()])
             } else if (isJSMFEnum(e)) {
                 newNodes = []
             } else if (isJSMFElement(e)) {
               const refs = conformsTo(e).getAllReferences()
+              const associated = _(e.getAssociated()).values().flatten().map('associated').value()
               newNodes = _(refs).map((v, x) => e[x]).flatten().value()
+              newNodes = newNodes.concat(associated)
             }
             toVisit = toVisit.concat(newNodes)
         }
     }
-    return dispatch(visited)
+    return dispatch(Array.from(visited))
 }
 
 function dispatch(elems) {

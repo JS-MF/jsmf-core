@@ -143,7 +143,9 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
         this.references[name].opposite = opposite
         target.references[opposite] =
             { type: this
-            , cardinality: Cardinality.check(oppositeCardinality)
+            , cardinality: oppositeCardinality === undefined && target.references[opposite] !== undefined ?
+                target.references[opposite].cardinality :
+                Cardinality.check(oppositeCardinality)
             , opposite: name
             }
     }
@@ -195,8 +197,8 @@ function setSuperType(s) {
     this.superClasses = _.uniq(this.superClasses.concat(ss))
 }
 
-function addAttribute(name, type) {
-  this.attributes[name] = Type.normalizeType(type)
+function addAttribute(name, type, mandatory) {
+  this.attributes[name] = {type: Type.normalizeType(type), mandatory: mandatory || false}
 }
 
 function removeAttribute(name) {
@@ -204,14 +206,20 @@ function removeAttribute(name) {
 }
 
 function addAttributes(attrs) {
-  _.forEach(attrs, (v, k) => this.addAttribute(k, v))
+  _.forEach(attrs, (v, k) => {
+    if (v.type !== undefined) {
+      this.addAttribute(k, v.type, v.mandatory)
+    } else {
+      this.addAttribute(k, v)
+    }
+  })
 }
 
 
 function createAttributes(e, cls) {
-    _.forEach(cls.getAllAttributes(), (type, name) => {
+    _.forEach(cls.getAllAttributes(), (desc, name) => {
         e.__jsmf__.attributes[name] = undefined
-        createAttribute(e, name, type)
+        createAttribute(e, name, desc)
     })
 }
 
@@ -225,8 +233,8 @@ function createReferences(e, cls) {
     })
 }
 
-function createAttribute(o, name, type) {
-    createSetAttribute(o,name, type)
+function createAttribute(o, name, desc) {
+    createSetAttribute(o,name, desc)
     Object.defineProperty(o, name,
         { get: () => o.__jsmf__.attributes[name]
         , set: o[setName(name)]
@@ -235,10 +243,10 @@ function createAttribute(o, name, type) {
     );
 }
 
-function createSetAttribute(o, name, type) {
+function createSetAttribute(o, name, desc) {
     Object.defineProperty(o, setName(name),
         {value: x => {
-                if (type(x)) {
+                if (desc.type(x) || (!desc.mandatory && (_.isNull(x) || _.isUndefined(x)))) {
                     o.__jsmf__.attributes[name] = x;
                 } else {
                     throw new TypeError(`Invalid assignment: ${x} for object ${o}`);
@@ -246,6 +254,11 @@ function createSetAttribute(o, name, type) {
             }
         , enumerable: false
         });
+}
+
+function hasClass(x, type) {
+    const types = type instanceof Array ? type : [type]
+    return _.some(x.conformsTo().getInheritanceChain(), c => _.includes(types, c))
 }
 
 
@@ -351,4 +364,4 @@ function prefixedName(pre, n) {
 }
 
 
-module.exports = { Class, isJSMFClass, checkCardinality }
+module.exports = { Class, isJSMFClass, hasClass, checkCardinality }

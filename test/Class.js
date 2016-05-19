@@ -93,32 +93,40 @@ describe('Class', function() {
           var State = new Class('State');
           State.attributes.should.be.empty;
           State.setAttribute('name', JSMF.String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: false});
           done();
         });
 
         it('allows normalize built-in primitive types', function(done) {
           var State = new Class('State');
-          State.attributes.should.be.empty;
+          State.attributes.should.be.empty();
           State.setAttribute('name', String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: false});
+          done();
+        });
+
+        it('allows mandatory attributes', function(done) {
+          var State = new Class('State');
+          State.attributes.should.be.empty();
+          State.setAttribute('name', String, true);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: true});
           done();
         });
 
         it('has addAttribute is a synonym to setAttribute', function(done) {
           var State = new Class('State');
-          State.attributes.should.be.empty;
+          State.attributes.should.be.empty();
           State.addAttribute('name', JSMF.String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: false});
           done();
         });
 
         it('accept bulk setting', function(done) {
           var State = new Class('State');
           State.attributes.should.be.empty;
-          State.addAttributes({name: JSMF.String, age: Number});
-          State.attributes.should.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.addAttributes({name: {type: JSMF.String, mandatory: true}, age: Number});
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: true});
+          State.attributes.should.have.property('age', {type: JSMF.Number, mandatory: false});
           done();
         });
 
@@ -127,22 +135,22 @@ describe('Class', function() {
           State.attributes.should.be.empty;
           State.addAttributes({name: JSMF.Number});
           State.addAttributes({name: JSMF.String});
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: false});
           done();
         });
 
         it('can be set at initialization', function(done) {
           var State = new Class('State', [], {name: JSMF.String, age: Number});
-          State.attributes.should.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.attributes.should.have.property('name', {type: JSMF.String, mandatory: false});
+          State.attributes.should.have.property('age', {type: JSMF.Number, mandatory: false});
           done();
         });
 
         it ('can be removed', function(done) {
           var State = new Class('State', [], {name: JSMF.String, age: Number});
           State.removeAttribute('name');
-          State.attributes.should.not.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.attributes.should.not.have.property('name');
+          State.attributes.should.have.property('age', {type: JSMF.Number, mandatory: false});
           done();
         });
 
@@ -199,6 +207,17 @@ describe('Class', function() {
             Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners');
             SuperPower.references.should.have.property('owners');
             Hero.references.has.should.have.property('opposite', 'owners');
+            done();
+        });
+
+        it('keep the cardinality of the opposite ref if it exists', function(done) {
+            const Hero = new Class('Hero')
+            const SuperPower = new Class('SuperPower')
+            SuperPower.setReference('owners', Hero, JSMF.Cardinality.one)
+            Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners')
+            SuperPower.references.should.have.property('owners')
+            SuperPower.references.owners.cardinality.should.have.properties({min: 1, max: 1})
+            SuperPower.references.owners.should.have.property('opposite', 'has')
             done();
         });
 
@@ -292,8 +311,8 @@ describe('Class', function() {
             var State = new Class('State');
             State.attributes.should.be.empty;
             State.addAttributes({name: JSMF.String, age: Number});
-            State.getAllAttributes().should.have.property('name', JSMF.String);
-            State.getAllAttributes().should.have.property('age', JSMF.Number);
+            State.getAllAttributes().should.have.property('name', {type: JSMF.String, mandatory: false});
+            State.getAllAttributes().should.have.property('age', {type: JSMF.Number, mandatory: false});
             done();
         });
 
@@ -304,9 +323,9 @@ describe('Class', function() {
             State.addAttributes({name: JSMF.String, age: Number});
             function positive(x) {return x > 0;}
             TargetState.addAttributes({age: positive, value: JSMF.Any});
-            TargetState.getAllAttributes().should.have.property('name', JSMF.String);
-            TargetState.getAllAttributes().should.have.property('age', positive);
-            TargetState.getAllAttributes().should.have.property('value', JSMF.Any);
+            TargetState.getAllAttributes().should.have.property('name', {type: JSMF.String, mandatory: false});
+            TargetState.getAllAttributes().should.have.property('age', {type: positive, mandatory: false});
+            TargetState.getAllAttributes().should.have.property('value', {type: JSMF.Any, mandatory: false});
             done();
         });
 
@@ -314,7 +333,7 @@ describe('Class', function() {
             var A = new Class('A', [], {foo: JSMF.Number});
             var B = new Class('B', [], {foo: JSMF.String});
             var C = new Class('C', [A, B]);
-            C.getAllAttributes().should.have.property('foo',JSMF.String);
+            C.getAllAttributes().should.have.property('foo', {type: JSMF.String, mandatory: false});
             done();
         });
 

@@ -93,32 +93,52 @@ describe('Class', function() {
           var State = new Class('State');
           State.attributes.should.be.empty;
           State.setAttribute('name', JSMF.String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', false)
           done();
         });
 
         it('allows normalize built-in primitive types', function(done) {
           var State = new Class('State');
-          State.attributes.should.be.empty;
+          State.attributes.should.be.empty();
           State.setAttribute('name', String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', false)
+          done();
+        });
+
+        it('allows mandatory attributes', function(done) {
+          var State = new Class('State');
+          State.attributes.should.be.empty();
+          State.setAttribute('name', String, true);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', true)
           done();
         });
 
         it('has addAttribute is a synonym to setAttribute', function(done) {
           var State = new Class('State');
-          State.attributes.should.be.empty;
+          State.attributes.should.be.empty();
           State.addAttribute('name', JSMF.String);
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', false)
           done();
         });
 
         it('accept bulk setting', function(done) {
           var State = new Class('State');
           State.attributes.should.be.empty;
-          State.addAttributes({name: JSMF.String, age: Number});
-          State.attributes.should.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.addAttributes({name: {type: JSMF.String, mandatory: true}, age: Number});
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', true)
+          State.attributes.should.have.property('age')
+          State.attributes.age.should.have.property('type', JSMF.Number)
+          State.attributes.age.should.have.property('mandatory', false)
           done();
         });
 
@@ -127,22 +147,30 @@ describe('Class', function() {
           State.attributes.should.be.empty;
           State.addAttributes({name: JSMF.Number});
           State.addAttributes({name: JSMF.String});
-          State.attributes.should.have.property('name', JSMF.String);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', false)
           done();
         });
 
         it('can be set at initialization', function(done) {
           var State = new Class('State', [], {name: JSMF.String, age: Number});
-          State.attributes.should.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.attributes.should.have.property('name')
+          State.attributes.name.should.have.property('type', JSMF.String)
+          State.attributes.name.should.have.property('mandatory', false)
+          State.attributes.should.have.property('age')
+          State.attributes.age.should.have.property('type', JSMF.Number)
+          State.attributes.age.should.have.property('mandatory', false)
           done();
         });
 
         it ('can be removed', function(done) {
           var State = new Class('State', [], {name: JSMF.String, age: Number});
           State.removeAttribute('name');
-          State.attributes.should.not.have.property('name', JSMF.String);
-          State.attributes.should.have.property('age', JSMF.Number);
+          State.attributes.should.not.have.property('name');
+          State.attributes.should.have.property('age')
+          State.attributes.age.should.have.property('type', JSMF.Number)
+          State.attributes.age.should.have.property('mandatory', false)
           done();
         });
 
@@ -199,6 +227,17 @@ describe('Class', function() {
             Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners');
             SuperPower.references.should.have.property('owners');
             Hero.references.has.should.have.property('opposite', 'owners');
+            done();
+        });
+
+        it('keep the cardinality of the opposite ref if it exists', function(done) {
+            const Hero = new Class('Hero')
+            const SuperPower = new Class('SuperPower')
+            SuperPower.setReference('owners', Hero, JSMF.Cardinality.one)
+            Hero.setReference('has', SuperPower, JSMF.Cardinality.any, 'owners')
+            SuperPower.references.should.have.property('owners')
+            SuperPower.references.owners.cardinality.should.have.properties({min: 1, max: 1})
+            SuperPower.references.owners.should.have.property('opposite', 'has')
             done();
         });
 
@@ -292,21 +331,33 @@ describe('Class', function() {
             var State = new Class('State');
             State.attributes.should.be.empty;
             State.addAttributes({name: JSMF.String, age: Number});
-            State.getAllAttributes().should.have.property('name', JSMF.String);
-            State.getAllAttributes().should.have.property('age', JSMF.Number);
+            const res = State.getAllAttributes()
+            res.should.have.property('name')
+            res.name.should.have.property('type', JSMF.String)
+            res.name.should.have.property('mandatory', false)
+            res.should.have.property('age')
+            res.age.should.have.property('type', JSMF.Number)
+            res.age.should.have.property('mandatory', false)
             done();
         });
 
         it('get parents attributes, override them if necessary', function(done) {
-            var State = new Class('State');
-            var TargetState = new Class('TargetState', State);
-            State.attributes.should.be.empty;
-            State.addAttributes({name: JSMF.String, age: Number});
+            const State = new Class('State')
+            const TargetState = new Class('TargetState', State)
+            State.attributes.should.be.empty()
+            State.addAttributes({name: JSMF.String, age: Number})
             function positive(x) {return x > 0;}
-            TargetState.addAttributes({age: positive, value: JSMF.Any});
-            TargetState.getAllAttributes().should.have.property('name', JSMF.String);
-            TargetState.getAllAttributes().should.have.property('age', positive);
-            TargetState.getAllAttributes().should.have.property('value', JSMF.Any);
+            TargetState.addAttributes({age: positive, value: JSMF.Any})
+            const res = TargetState.getAllAttributes()
+            res.should.have.property('name')
+            res.name.should.have.property('type', JSMF.String)
+            res.name.should.have.property('mandatory', false)
+            res.should.have.property('age')
+            res.age.should.have.property('type', positive)
+            res.age.should.have.property('mandatory', false)
+            res.should.have.property('value')
+            res.value.should.have.property('type', JSMF.Any)
+            res.value.should.have.property('mandatory', false)
             done();
         });
 
@@ -314,7 +365,10 @@ describe('Class', function() {
             var A = new Class('A', [], {foo: JSMF.Number});
             var B = new Class('B', [], {foo: JSMF.String});
             var C = new Class('C', [A, B]);
-            C.getAllAttributes().should.have.property('foo',JSMF.String);
+            const res = C.getAllAttributes()
+            res.should.have.property('foo')
+            res.foo.should.have.property('type', JSMF.String)
+            res.foo.should.have.property('mandatory', false)
             done();
         });
 
@@ -330,28 +384,28 @@ describe('Class', function() {
             done();
         });
 
-        it('get parents attributes, override them if necessary', function(done) {
+        it('get parents references, override them if necessary', function(done) {
             var State = new Class('State');
             var TargetState = new Class('TargetState', State);
-            State.attributes.should.be.empty;
+            State.attributes.should.be.empty();
             State.addAttributes({name: JSMF.String, age: Number});
             State.addReference('next', State);
             TargetState.addReference('next', TargetState);
             var references = TargetState.getAllReferences();
             references.should.have.property('next');
-            references.next.should.have.property('type', TargetState);
+            references.next.type.should.eql(TargetState);
             done();
         });
 
         it ('kept the references of the last inherited class', function(done) {
-            var A = new Class('A');
-            A.addReference('foo', A);
-            var B = new Class('B');
-            B.addReference('foo', B);
-            var C = new Class('C', [A, B]);
-            var references = C.getAllReferences();
-            references.should.have.property('foo');
-            references.foo.should.have.property('type', B);
+            const A = new Class('A')
+            A.addReference('foo', A)
+            const B = new Class('B')
+            B.addReference('foo', B)
+            const C = new Class('C', [A, B])
+            const references = C.getAllReferences()
+            references.should.have.property('foo')
+            references.foo.type.should.eql(B)
             done();
         });
 

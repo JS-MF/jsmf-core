@@ -139,7 +139,7 @@ function addReferences(descriptors) {
           desc.opposite,
           desc.oppositeCardinality,
           desc.associated,
-          desc.errorCallback
+          desc.errorCallback,
           desc.oppositeErrorCallback)
         )
 }
@@ -156,7 +156,7 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
                 target.references[opposite].cardinality :
                 Cardinality.check(oppositeCardinality)
             , opposite: name
-            , errorCallback = oppositeErrorCallback === undefined && target.references[opposite] !== undefined ?
+            , errorCallback: oppositeErrorCallback === undefined && target.references[opposite] !== undefined ?
                 target.references[opposite].oppositeErrorCallback :
                 onError.throw
             }

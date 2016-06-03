@@ -1,3 +1,13 @@
+0.7.0:
+    Features:
+    - Models and Classes and Enums are now JSMF elements
+    - Flexible Models
+    - Model and element Conformance check
+
+0.6.0:
+    Internal:
+    - Migration to ES6
+
 0.5.0:
 
     Model:

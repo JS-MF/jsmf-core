@@ -59,6 +59,7 @@ function Class(name, superClasses, attributes, references) {
 }
 
 Class.__name = 'Class'
+Class.getInheritanceChain = () => [Class]
 
 Class.newInstance = (name, superClasses, attributes, references) => new Class(name, superClasses, attributes, references)
 

@@ -113,7 +113,7 @@ describe('Class Flexibility', () => {
   describe('change flexibility behaviour to flexible', () => {
 
     it('assigns on invalid attribute value', done => {
-      const A = new Class('A', [], {x: {type: Number, errorCallback: JSMF.onError.silent}})
+      const A = new Class('A', [], {x: {type: Number, errorCallback: JSMF.onError.throw}})
       A.setFlexible(true)
       let x = new A({x: 12})
       x.x = 'toto'
@@ -123,9 +123,9 @@ describe('Class Flexibility', () => {
 
     it('assigns on invalid reference value', done => {
       const A = new Class('A', [])
-      A.setFlexible(true)
       const B = new Class('B', [])
-      A.addReference('x', A, 1, undefined, undefined, undefined, JSMF.onError.silent)
+      A.addReference('x', A, 1, undefined, undefined, undefined, JSMF.onError.throw)
+      A.setFlexible(true)
       let x = new A()
       x.x = x
       let y = new B()

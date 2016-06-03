@@ -58,7 +58,7 @@ const referencesTypeRule = new check.Rule(
         return this[0][this[1].name]
       }))
     ],
-    (e, r, v) => {console.log(Class); try { return hasClass(v, r.type) } catch (err) { return false }}
+    (e, r, v) => {try { return hasClass(v, r.type) } catch (err) { return false }}
 )
 
 const associatedTypeRule = new check.Rule(

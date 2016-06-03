@@ -4,9 +4,9 @@ const _ = require('lodash')
 
 let isJSMFElement, conformsTo;
 (function() {
-    var common = require('./Common');
-    isJSMFElement = common.isJSMFElement;
-    conformsTo = common.conformsTo;
+    var common = require('./Common')
+    isJSMFElement = common.isJSMFElement
+    conformsTo = common.conformsTo
 }).call();
 
 const isJSMFEnum = require('./Enum').isJSMFEnum
@@ -14,6 +14,7 @@ const isJSMFClass = require('./Class').isJSMFClass
 
 function Model(name, referenceModel, modellingElements, transitive) {
     this.__name = name
+    _.set(this, ['__jsmf__','conformsTo'], Model)
     this.referenceModel = referenceModel || {}
     this.modellingElements = {}
     if (modellingElements !== undefined) {
@@ -48,6 +49,8 @@ Model.prototype.Filter = function(cls) {
     return this.modellingElements[_.get(cls, '__name')]
 }
 
+Model.getInheritanceChain = _.constant([Model])
+Model.prototype.conformsTo = () => conformsTo(this)
 Model.prototype.setModellingElements = Model.prototype.addModellingElement
 Model.prototype.add = Model.prototype.addModellingElement
 Model.prototype.setReferenceModel = function(rm) {this.referenceModel = rm}

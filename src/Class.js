@@ -169,6 +169,7 @@ function populateClassFunction(cls) {
     , setAttributes: {value: addAttributes}
     , setSuperType: {value: setSuperType}
     , setSuperClass: {value: setSuperType}
+    , setFlexible: {value: setFlexible}
     })
 }
 
@@ -230,7 +231,7 @@ function createAttribute(o, name, desc) {
 function createSetAttribute(o, name, desc) {
   Object.defineProperty(o, setName(name),
     {value: x => {
-      if (!desc.type(x) && (desc.mandatory || !_.isUndefined(x))) {
+      if (!desc.type(x) || (desc.mandatory && _.isUndefined(x))) {
         desc.errorCallback(o, name, x)
       }
       o.__jsmf__.attributes[name] = x
@@ -317,6 +318,17 @@ function classMeta() {
   return {uuid: uuid.v4(), conformsTo: Class}
 }
 
+function setFlexible(b) {
+  if (b) {
+    _.forEach(this.references, r => r.errorCallback = onError.silent)
+    _.forEach(this.attributes, r => r.errorCallback = onError.silent)
+  } else {
+    _.forEach(this.references, r => r.errorCallback = onError.throw)
+    _.forEach(this.attributes, r => r.errorCallback = onError.throw)
+  }
+}
+
+
 function elementMeta(constructor) {
   return { conformsTo: constructor
          , uuid: uuid.v4()
@@ -348,6 +360,5 @@ const onError =
   , 'log': (o,n,x) => {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
   , 'silent': () => undefined
   }
-
 
 module.exports = { Class, isJSMFClass, hasClass, onError }

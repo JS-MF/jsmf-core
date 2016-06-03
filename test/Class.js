@@ -1,8 +1,8 @@
-'use strict';
+'use strict'
 
-var should = require('should');
-var JSMF = require('../src/index');
-var Class = JSMF.Class;
+const should = require('should')
+    , JSMF = require('../src/index')
+    , Class = JSMF.Class
 
 describe('Class', function() {
 

@@ -1,10 +1,12 @@
 # JSMF-Core
 
+[![build status](https://git.list.lu/jsmf/jsmf-core/badges/master/build.svg)](https://git.list.lu/jsmf/jsmf-core/commits/master)
+
 A part of the JSMF project dedicated to model definition.
 
 ## Install
 
-Thanks to npm: `npm install git+ssh://git@git.list.lu:model/jsmf.git`
+Thanks to npm: `npm install git+ssh://git@git.list.lu:model/jsmf.git#0.7.0`
 
 ## License information
 

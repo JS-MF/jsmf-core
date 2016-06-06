@@ -2,7 +2,7 @@ before_script:
   - eval $(ssh-agent -s)
   - ssh-add <(echo "$SSH_PRIVATE_KEY")
   - ssh-add -L
-  - curl -sL https://deb.nodesource.com/setup_4.x | sudo -E bash -
+  - curl -sL https://deb.nodesource.com/setup_4.x | bash -
   - apt-get update -qq && apt-get install -y nodejs && npm install
 test:
   script:

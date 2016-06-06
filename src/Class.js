@@ -41,13 +41,13 @@ function Class(name, superClasses, attributes, references) {
     const o = this
     Object.defineProperties(o,
       { __jsmf__: {value: elementMeta(jsmfElement)}
-      , conformsTo: {value: () => conformsTo(o)}
-      , getAssociated: {value: getAssociated}
       })
     createAttributes(o, jsmfElement)
     createReferences(o, jsmfElement)
     _.forEach(attr, (v,k) => o[k] = v)
   }
+  jsmfElement.prototype.conformsTo = function () { return conformsTo(this) }
+  jsmfElement.prototype.getAssociated = getAssociated
   superClasses = superClasses || []
   superClasses = superClasses instanceof Array ? superClasses : [superClasses]
   Object.assign(jsmfElement, {__name: name, superClasses, attributes: {}, references: {}})
@@ -65,9 +65,7 @@ Class.newInstance = (name, superClasses, attributes, references) => new Class(na
 
 /** Return true if the given object is a JSMF Class.
  */
-function isJSMFClass(o) {
-  return conformsTo(o) === Class
-}
+const isJSMFClass = o => conformsTo(o) === Class
 
 
 function getInheritanceChain() {

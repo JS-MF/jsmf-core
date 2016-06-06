@@ -38,13 +38,12 @@ const _ = require('lodash')
  */
 function Class(name, superClasses, attributes, references) {
   function jsmfElement(attr) {
-    const o = this
-    Object.defineProperties(o,
+    Object.defineProperties(this,
       { __jsmf__: {value: elementMeta(jsmfElement)}
       })
-    createAttributes(o, jsmfElement)
-    createReferences(o, jsmfElement)
-    _.forEach(attr, (v,k) => o[k] = v)
+    createAttributes(this, jsmfElement)
+    createReferences(this, jsmfElement)
+    _.forEach(attr, (v,k) => this[k] = v)
   }
   jsmfElement.prototype.conformsTo = function () { return conformsTo(this) }
   jsmfElement.prototype.getAssociated = getAssociated

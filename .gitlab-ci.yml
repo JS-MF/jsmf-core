@@ -1,4 +1,5 @@
 before_script:
+  - eval $(ssh-agent -s)
   - echo $PKEY > ~/gilabci_pkey
   - chmod 600 ~/gilabci_pkey
   - ssh-add ~/gilabci_pkey

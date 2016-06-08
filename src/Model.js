@@ -17,6 +17,8 @@ function Model(name, referenceModel, modellingElements, transitive) {
   _.set(this, ['__jsmf__','conformsTo'], Model)
   this.referenceModel = referenceModel || {}
   this.modellingElements = {}
+  this.elemByClassId = new Map()
+  this.classes = {}
   if (modellingElements !== undefined) {
     modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements]
     if (transitive) {
@@ -27,9 +29,7 @@ function Model(name, referenceModel, modellingElements, transitive) {
 }
 
 function modelExport(m) {
-  const result = _(m.modellingElements).mapValues(_.head)
-                                       .pickBy(x => isJSMFClass(x) || isJSMFEnum(x))
-                                       .value()
+  const result = _.mapValues(m.classes, _.head)
   result[m.__name] = m
   return result
 }
@@ -38,11 +38,25 @@ Model.prototype.addModellingElement = function(es) {
   es = es instanceof Array ? es : [es]
   _.forEach(es, e => {
     if (!isJSMFElement(e)) {throw new TypeError(`can't Add ${e} to model ${this}`)}
-    const key = (isJSMFClass(e) || isJSMFEnum(e)) ? e.__name : conformsTo(e).__name
-    const current = this.modellingElements[key] || []
-    current.push(e)
-    this.modellingElements[key] = current
+    addToClass(this, e)
+    addToModellingElements(this, e)
   })
+}
+
+function addToClass(m, e) {
+  if (isJSMFClass(e) || isJSMFEnum(e)) {
+    const key = e.__name
+    const current = m.classes[key] || []
+    current.push(e)
+    m.classes[key] = current
+  }
+}
+
+function addToModellingElements(m, e) {
+  const key = conformsTo(e).__name
+  const current = m.modellingElements[key] || []
+  current.push(e)
+  m.modellingElements[key] = current
 }
 
 Model.prototype.Filter = function(cls) {

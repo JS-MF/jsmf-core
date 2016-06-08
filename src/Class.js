@@ -10,11 +10,15 @@ Authors : J.S. Sottet, A. Vagner, N. Biri
 'use strict'
 
 const _ = require('lodash')
-    , uuid = require('uuid')
     , Type = require('./Type')
-    , conformsTo = require('./Common').conformsTo
     , Cardinality = require('./Cardinality').Cardinality
 
+let conformsTo, generateId
+(function () {
+  const Common = require('./Common')
+  conformsTo = Common.conformsTo
+  generateId = Common.generateId
+}).call()
 
 /**
  * Creation of a JSMF Class.
@@ -313,7 +317,7 @@ function createRemoveReference(o, name) {
 
 
 function classMeta() {
-  return {uuid: uuid.v4(), conformsTo: Class}
+  return {uuid: generateId(), conformsTo: Class}
 }
 
 function setFlexible(b) {
@@ -326,10 +330,9 @@ function setFlexible(b) {
   }
 }
 
-
 function elementMeta(constructor) {
   return { conformsTo: constructor
-         , uuid: uuid.v4()
+         , uuid: generateId()
          , attributes: {}
          , references: {}
          , associated: {}

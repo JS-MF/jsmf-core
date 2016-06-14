@@ -1,3 +1,9 @@
+0.8.0:
+    Internal Changes:
+    - Classes & Enums are now store under resp. the key "Class" and "Enum"
+    - In Models, classes allows an access to Classes and Enum by their names
+    - UUID are stored in their binary format (no longer as a string)
+
 0.7.0:
     Features:
     - Models and Classes and Enums are now JSMF elements

@@ -47,7 +47,7 @@ function Class(name, superClasses, attributes, references) {
             });
         createAttributes(o, jsmfElement)
         createReferences(o, jsmfElement)
-        _.forEach(attr, (v,k) => o[k] = v)
+        _.forEach(attr, (v,k) => {o[k] = v})
     }
     superClasses = superClasses || []
     jsmfElement.__name = name

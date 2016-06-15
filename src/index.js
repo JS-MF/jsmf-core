@@ -30,7 +30,6 @@ const Class = require('./Class')
 const Enum = require('./Enum')
 const Cardinality = require('./Cardinality')
 const Type = require('./Type')
-const Conformance = require('./ConformanceCheck')
 
-module.exports = _.assign(Common, Model, Class, Enum, Cardinality, Type, Conformance)
+module.exports = _.assign(Common, Model, Class, Enum, Cardinality, Type)
 

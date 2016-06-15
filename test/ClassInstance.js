@@ -95,6 +95,13 @@ describe('Class instance', function() {
             done()
         })
 
+        it('doesn\'t stop on false value', function(done) {
+            const C = new Class('C', undefined, {a: Boolean, b: Number})
+            const c = new C({a: false, b: 12})
+            c.should.have.property('b', 12)
+            done()
+        })
+
         it('assign wongly typed values on relaxed schema', function(done) {
             const Foo = new Class('Foo', [], {test: {type: Number, errorCallback: JSMF.onError.silent}})
             const s = new Foo({test: "i'm not a number"})

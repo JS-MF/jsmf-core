@@ -60,7 +60,7 @@ function Class(name, superClasses, attributes, references) {
       })
     createAttributes(this, jsmfElement)
     createReferences(this, jsmfElement)
-    _.forEach(attr, (v,k) => this[k] = v)
+    _.forEach(attr, (v,k) => {this[k] = v})
   }
   jsmfElement.prototype.conformsTo = function () { return conformsTo(this) }
   jsmfElement.prototype.getAssociated = getAssociated

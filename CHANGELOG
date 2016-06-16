@@ -1,3 +1,5 @@
+0.9.0:
+    - Externalize Model conformance
 0.8.0:
     Internal Changes:
     - Classes & Enums are now store under resp. the key "Class" and "Enum"

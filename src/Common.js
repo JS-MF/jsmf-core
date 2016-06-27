@@ -37,6 +37,7 @@ function isJSMFElement(o) {
   const implement = conformsTo(o)
   return implement
     && _.get(implement, 'getInheritanceChain') !== undefined
+    && jsmfId(o) !== undefined
 }
 
 function generateId() {

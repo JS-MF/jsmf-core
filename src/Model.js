@@ -24,11 +24,12 @@
 
 const _ = require('lodash')
 
-let isJSMFElement, conformsTo
+let isJSMFElement, conformsTo, generateId
 (function() {
   const common = require('./Common')
   isJSMFElement = common.isJSMFElement
   conformsTo = common.conformsTo
+  generateId = common.generateId
 }).call()
 
 const isJSMFEnum = require('./Enum').isJSMFEnum
@@ -37,6 +38,7 @@ const isJSMFClass = require('./Class').isJSMFClass
 function Model(name, referenceModel, modellingElements, transitive) {
   this.__name = name
   _.set(this, ['__jsmf__','conformsTo'], Model)
+  _.set(this, ['__jsmf__','uuid'], generateId())
   this.referenceModel = referenceModel || {}
   this.modellingElements = {}
   this.elemByClassId = new Map()

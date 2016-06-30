@@ -1,6 +1,6 @@
 {
   "name": "jsmf-core",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Javascript Modelling Framework",
   "main": "src/index.js",
   "directories": {

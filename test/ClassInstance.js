@@ -95,6 +95,22 @@ describe('Class instance', function() {
             done()
         })
 
+        it('throws error when we set undefined value for mandatory attribute', function(done) {
+            const Foo = new Class('Foo', [], {x: {type: Number, mandatory: true}});
+            const s = new Foo({x: 12})
+            function test() {s.x = undefined}
+            test.should.throw()
+            done()
+        })
+
+        it('allows undefined value to optional attribute', function(done) {
+            const Foo = new Class('Foo', [], {x: {type: Number, mandatory: false}});
+            const s = new Foo({x: 12})
+            function test() {s.x = undefined}
+            test.should.not.throw()
+            done()
+        })
+
         it('doesn\'t stop on false value', function(done) {
             const C = new Class('C', undefined, {a: Boolean, b: Number})
             const c = new C({a: false, b: 12})

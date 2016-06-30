@@ -29,9 +29,9 @@ const conformsTo = require('./Common').conformsTo
 
 function Enum(name, values) {
   function jsmfEnum(x) {return _.includes(jsmfEnum, x)}
-  jsmfEnum.__name = name
   Object.defineProperties(jsmfEnum,
     { __jsmf__: {value: {uuid: uuid.v4(), conformsTo: Enum}}
+    , __name: {value: name}
     , getName: {value: getName}
     , conformsTo: {value: () => conformsTo(jsmfEnum)}
     })

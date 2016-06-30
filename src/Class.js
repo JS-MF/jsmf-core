@@ -246,7 +246,7 @@ function createAttribute(o, name, desc) {
 function createSetAttribute(o, name, desc) {
   Object.defineProperty(o, setName(name),
     {value: x => {
-      if (!desc.type(x) || (desc.mandatory && _.isUndefined(x))) {
+      if (!desc.type(x) && (desc.mandatory || !_.isUndefined(x))) {
         desc.errorCallback(o, name, x)
       }
       o.__jsmf__.attributes[name] = x
@@ -366,7 +366,7 @@ function removeName(n) {
 }
 
 function prefixedName(pre, n) {
-  return pre + n[0].toUpperCase() + n.slice(1)
+  return pre + _.capitalize(n)
 }
 
 const onError =

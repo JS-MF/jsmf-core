@@ -122,7 +122,7 @@ function crawlElements(init) {
       let newNodes
       if (isJSMFClass(e)) {
         const refs = e.getAllReferences()
-        const refTypes = _.map(refs, 'type')
+        const refTypes = _(refs).map('type').filter(isJSMFClass).value()
         const attrs = e.getAllAttributes()
         const attrsEnum = _(attrs).values().map('type').filter(isJSMFEnum).value()
         newNodes = _.flatten([refTypes, attrsEnum, e.getInheritanceChain()])

@@ -259,6 +259,15 @@ describe('Class instance', function() {
             done()
         })
 
+        it ('creates correct setter names for camel case fields', function(done) {
+            const s = new State()
+            const T = new JSMF.Class('T')
+            T.addReference('testCamel', State, JSMF.Cardinality.any, undefined, undefined, State)
+            const t1 = new T()
+            should(t1.addTestCamel).not.be.undefined()
+            done()
+        })
+
     })
 
 })

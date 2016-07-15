@@ -366,7 +366,7 @@ function removeName(n) {
 }
 
 function prefixedName(pre, n) {
-  return pre + _.capitalize(n)
+  return pre + _.upperFirst(n)
 }
 
 const onError =

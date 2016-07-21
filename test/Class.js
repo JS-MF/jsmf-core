@@ -382,38 +382,37 @@ describe('Class', function() {
 
     describe('Class getAllReferences', function() {
 
-        it('returns the references of the class if no inheritance', function(done) {
-            var State = new Class('State')
-            State.attributes.should.be.empty
-            State.addReference('next', State)
-            State.getAllReferences().should.have.property('next')
-            done()
+        it('returns the references of the class if no inheritance', done => {
+          var State = new Class('State')
+          State.attributes.should.be.empty
+          State.addReference('next', State)
+          State.getAllReferences().should.have.property('next')
+          done()
         })
 
-        it('get parents references, override them if necessary', function(done) {
-            var State = new Class('State')
-            var TargetState = new Class('TargetState', State)
-            State.attributes.should.be.empty()
-            State.addAttributes({name: JSMF.String, age: Number})
-            State.addReference('next', State)
-            TargetState.addReference('next', TargetState)
-            var references = TargetState.getAllReferences()
-            references.should.have.property('next')
-            references.next.type.should.eql(TargetState)
-            done()
+        it('get parents references, override them if necessary', done => {
+          var State = new Class('State')
+          var TargetState = new Class('TargetState', State)
+          State.attributes.should.be.empty()
+          State.addAttributes({name: JSMF.String, age: Number})
+          State.addReference('next', State)
+          TargetState.addReference('next', TargetState)
+          var references = TargetState.getAllReferences()
+          references.should.have.property('next')
+          references.next.type.should.eql(TargetState)
+          done()
         })
 
-        it ('kept the references of the last inherited class', function(done) {
-            const A = new Class('A')
-            A.addReference('foo', A)
-            const B = new Class('B')
-            B.addReference('foo', B)
-            const C = new Class('C', [A, B])
-            const references = C.getAllReferences()
-            references.should.have.property('foo')
-            references.foo.type.should.eql(B)
-            done()
+        it ('kept the references of the last inherited class', done => {
+          const A = new Class('A')
+          A.addReference('foo', A)
+          const B = new Class('B')
+          B.addReference('foo', B)
+          const C = new Class('C', [A, B])
+          const references = C.getAllReferences()
+          references.should.have.property('foo')
+          references.foo.type.should.eql(B)
+          done()
         })
-
     })
 })

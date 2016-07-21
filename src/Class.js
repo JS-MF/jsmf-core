@@ -53,7 +53,7 @@ let conformsTo, generateId
  * @param {Object} attributes - the references of the class.
  * @constructor
  */
-function Class(name, superClasses, attributes, references) {
+function Class(name, superClasses, attributes, references, flexible) {
   function jsmfElement(attr) {
     Object.defineProperties(this,
       { __jsmf__: {value: elementMeta(jsmfElement)}
@@ -62,11 +62,16 @@ function Class(name, superClasses, attributes, references) {
     createReferences(this, jsmfElement)
     _.forEach(attr, (v,k) => {this[k] = v})
   }
-  jsmfElement.prototype.conformsTo = function () { return conformsTo(this) }
-  jsmfElement.prototype.getAssociated = getAssociated
+  Object.defineProperties(jsmfElement.prototype, {
+    conformsTo: {value: function () { return conformsTo(this) }, enumerable: false},
+    getAssociated : {value: getAssociated, enumerable: false}
+  })
   superClasses = superClasses || []
-  superClasses = superClasses instanceof Array ? superClasses : [superClasses]
+  superClasses = _.isArray(superClasses) ? superClasses : [superClasses]
   Object.assign(jsmfElement, {__name: name, superClasses, attributes: {}, references: {}})
+  jsmfElement.errorCallback = flexible
+    ? onError.silent
+    : onError.throw
   Object.defineProperty(jsmfElement, '__jsmf__', {value: classMeta()})
   populateClassFunction(jsmfElement)
   if (attributes !== undefined) { jsmfElement.addAttributes(attributes)}
@@ -139,9 +144,9 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
               target.references[opposite].cardinality :
               Cardinality.check(oppositeCardinality)
           , opposite: name
-          , errorCallback: oppositeErrorCallback === undefined && target.references[opposite] !== undefined ?
-              target.references[opposite].oppositeErrorCallback :
-              onError.throw
+          , errorCallback: oppositeErrorCallback === undefined && target.references[opposite] !== undefined
+              ? target.references[opposite].oppositeErrorCallback
+              : this.errorCallback
           }
   }
   if (associated !== undefined) {
@@ -150,7 +155,7 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
       target.references[opposite].associated = associated
     }
   }
-  this.references[name].errorCallback = errorCallback || onError.throw
+  this.references[name].errorCallback = errorCallback || this.errorCallback
 }
 
 function removeReference(name, opposite) {
@@ -197,7 +202,7 @@ function addAttribute(name, type, mandatory, errorCallback) {
   this.attributes[name] =
     { type: Type.normalizeType(type)
     , mandatory: mandatory || false
-    , errorCallback: errorCallback || onError.throw
+    , errorCallback: errorCallback || this.errorCallback
     }
 }
 
@@ -239,18 +244,20 @@ function createAttribute(o, name, desc) {
     { get: () => o.__jsmf__.attributes[name]
     , set: o[setName(name)]
     , enumerable: true
+    , configurable: true
     }
   )
 }
 
 function createSetAttribute(o, name, desc) {
   Object.defineProperty(o, setName(name),
-    {value: x => {
+    { value: x => {
       if (!desc.type(x) && (desc.mandatory || !_.isUndefined(x))) {
         desc.errorCallback(o, name, x)
       }
       o.__jsmf__.attributes[name] = x
     }
+    , configurable: true
     })
 }
 
@@ -285,6 +292,7 @@ function createReference(o, name, desc) {
       o.__jsmf__.references[name] = xs
     }
     , enumerable: true
+    , configurable: true
     })
 }
 
@@ -314,6 +322,7 @@ function createAddReference(o, name, desc) {
         })
       }
     }
+    , configurable: true
     })
 }
 
@@ -325,6 +334,7 @@ function createRemoveReference(o, name) {
       associationMap[name] = _.differenceWith(associationMap[name], xs, (x,y) => x.elem === y)
       o.__jsmf__.references[name] = _.difference(o.__jsmf__.references[name], xs)
     }
+    , configurable: true
     })
 }
 
@@ -334,13 +344,9 @@ function classMeta() {
 }
 
 function setFlexible(b) {
-  if (b) {
-    _.forEach(this.references, r => r.errorCallback = onError.silent)
-    _.forEach(this.attributes, r => r.errorCallback = onError.silent)
-  } else {
-    _.forEach(this.references, r => r.errorCallback = onError.throw)
-    _.forEach(this.attributes, r => r.errorCallback = onError.throw)
-  }
+  this.errorCallback = b ? onError.silent : onError.throw
+  _.forEach(this.references, r => r.errorCallback = this.errorCallback)
+  _.forEach(this.attributes, r => r.errorCallback = this.errorCallback)
 }
 
 function elementMeta(constructor) {
@@ -369,10 +375,24 @@ function prefixedName(pre, n) {
   return pre + _.upperFirst(n)
 }
 
+
+function refresh(o) {
+  const mm = o.conformsTo()
+  if (!mm) {return o}
+  const oBackup = Object.assign({}, o)
+  for (let x in o) {delete o[x]}
+  createAttributes(o, mm)
+  createReferences(o, mm)
+  for (let x in oBackup) {
+    o[x] = oBackup[x]
+  }
+  return o
+}
+
 const onError =
-  { 'throw': (o,n,x) => {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
-  , 'log': (o,n,x) => {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
-  , 'silent': () => undefined
+  { 'throw': function(o,n,x) {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
+  , 'log': function(o,n,x) {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
+  , 'silent': function() {}
   }
 
-module.exports = { Class, isJSMFClass, hasClass, onError }
+module.exports = { Class, isJSMFClass, hasClass, onError, refresh }

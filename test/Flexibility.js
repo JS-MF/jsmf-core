@@ -165,7 +165,7 @@ describe('Class Flexibility', () => {
       const A = new Class('A', [], {a: Number})
       const a = new A({a: 12})
       delete A.addAttribute('b', String)
-      JSMF.refresh(a)
+      JSMF.refreshElement(a)
       function test() {a.b = 42}
       test.should.throw()
       done()
@@ -175,7 +175,7 @@ describe('Class Flexibility', () => {
       const A = new Class('A', [], {a: Number})
       const a = new A({a: 12})
       delete A.addAttribute('b', String)
-      JSMF.refresh(a)
+      JSMF.refreshElement(a)
       function test() {a.b = 42}
       test.should.throw()
       done()
@@ -186,7 +186,7 @@ describe('Class Flexibility', () => {
       const A = new Class('A', [], {a: Number}, {}, true)
       const a = new A({a: 12})
       delete A.addAttribute('b', String)
-      JSMF.refresh(a)
+      JSMF.refreshElement(a)
       function test() {a.b = 42}
       test.should.not.throw()
       done()
@@ -197,7 +197,7 @@ describe('Class Flexibility', () => {
       const B = new Class('B')
       const a = new A({a: 12})
       delete A.addReference('b', B)
-      JSMF.refresh(a)
+      JSMF.refreshElement(a)
       function test() {a.b = new A()}
       test.should.not.throw()
       function testAddFunction() {a.addB(new A())}

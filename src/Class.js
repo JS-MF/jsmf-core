@@ -375,19 +375,19 @@ function prefixedName(pre, n) {
   return pre + _.upperFirst(n)
 }
 
-
-function refresh(o) {
+function refreshElement(o) {
   const mm = o.conformsTo()
   if (!mm) {return o}
   const oBackup = Object.assign({}, o)
   for (let x in o) {delete o[x]}
   createAttributes(o, mm)
   createReferences(o, mm)
-  for (let x in oBackup) {
-    o[x] = oBackup[x]
-  }
+  _.forEach(oBackup, (v, k) => {
+    if (v !== undefined) { o[k] = v }
+  })
   return o
 }
+
 
 const onError =
   { 'throw': function(o,n,x) {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
@@ -395,4 +395,4 @@ const onError =
   , 'silent': function() {}
   }
 
-module.exports = { Class, isJSMFClass, hasClass, onError, refresh }
+module.exports = { Class, isJSMFClass, hasClass, onError, refreshElement }

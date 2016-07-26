@@ -32,8 +32,14 @@ let isJSMFElement, conformsTo, generateId
   generateId = common.generateId
 }).call()
 
+let isJSMFClass, refreshElement
+(function() {
+  const C = require('./Class')
+  isJSMFClass = C.isJSMFClass
+  refreshElement = C.refreshElement
+}).call()
+
 const isJSMFEnum = require('./Enum').isJSMFEnum
-const isJSMFClass = require('./Class').isJSMFClass
 
 function Model(name, referenceModel, modellingElements, transitive) {
   this.__name = name
@@ -153,5 +159,10 @@ function dispatch(elems) {
       {})
 }
 
+function refreshModel(o) {
+  if (!(o instanceof Model)) {throw new TypeError('Model expected')}
+  _.forEach(o.elements(), refreshElement)
+}
 
-module.exports = {Model, modelExport}
+
+module.exports = {Model, modelExport, refreshModel}

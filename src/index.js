@@ -31,5 +31,51 @@ const Enum = require('./Enum')
 const Cardinality = require('./Cardinality')
 const Type = require('./Type')
 
-module.exports = _.assign(Common, Model, Class, Enum, Cardinality, Type)
+function customizer(obj, other) {
+  if (obj === other) {return true}
+  if (Common.isJSMFElement(obj) && Common.isJSMFElement(obj)) {
+    if (!jsmfIsEqual(obj.conformsTo(), other.conformsTo())) {
+      return false
+    }
+    if (Enum.isJSMFEnum(obj) && Enum.isJSMFEnum(other)) {
+      return jsmfIsEqual(dryEnum(obj), dryEnum(other))
+    } else if (Class.isJSMFClass(obj) && Class.isJSMFClass(other)) {
+      return jsmfIsEqual(dryClass(obj), dryClass(other))
+    } else if (obj instanceof Model.Model && obj instanceof Model.Model) {
+      return jsmfIsEqual(dryModel(obj), dryModel(other))
+    } else {
+      return jsmfIsEqual(dryElement(obj), dryElement(other))
+    }
+  }
+}
+
+function dryEnum(e) {
+  const res = _.toPairsIn(e)
+  return {__jsmf: {uuid: Common.jsmfId(e)}, values: res, name: e.__name}
+}
+
+function dryClass(c) {
+  return _.assign({__jsmf: {uuid: Common.jsmfId(c)}}, _.toPairsIn(_.omit(c, 'errorCallback')))
+}
+
+function dryElement(e) {
+  return _.assign({__jsmf: {uuid: Common.jsmfId(e), conformsTo: e.conformsTo()}}, _.toPairsIn(e))
+}
+
+function dryModel(c) {
+  return _.assign({__jsmf: {uuid: Common.jsmfId(c)}}, _.pick(c, ['__name', 'referenceModel', 'modellingElements']))
+}
+
+function jsmfIsEqual(obj, other) {
+  return _.isEqualWith(obj, other, customizer)
+}
+
+module.exports = _.assign(
+  {jsmfIsEqual},
+  Common,
+  Model,
+  Class,
+  Enum,
+  Cardinality,
+  Type)
 

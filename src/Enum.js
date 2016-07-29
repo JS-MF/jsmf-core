@@ -53,6 +53,4 @@ function isJSMFEnum(o) {
   return conformsTo(o) === Enum
 }
 
-
-
 module.exports = {Enum, isJSMFEnum}

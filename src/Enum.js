@@ -43,6 +43,8 @@ function Enum(name, values) {
   return jsmfEnum
 }
 
+Enum.__name = 'Enum'
+
 Enum.getInheritanceChain = () => [Enum]
 
 function getName(o) {

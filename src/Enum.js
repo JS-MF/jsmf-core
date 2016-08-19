@@ -23,14 +23,18 @@
 'use strict'
 
 const _ = require('lodash')
-const uuid = require('uuid')
 
-const conformsTo = require('./Common').conformsTo
+let conformsTo, generateId
+(function () {
+  const Common = require('./Common')
+  conformsTo = Common.conformsTo
+  generateId = Common.generateId
+}).call()
 
 function Enum(name, values) {
   function jsmfEnum(x) {return _.includes(jsmfEnum, x)}
   Object.defineProperties(jsmfEnum,
-    { __jsmf__: {value: {uuid: uuid.v4(), conformsTo: Enum}}
+    { __jsmf__: {value: {uuid: generateId(), conformsTo: Enum}}
     , __name: {value: name}
     , getName: {value: getName}
     , conformsTo: {value: () => conformsTo(jsmfEnum)}

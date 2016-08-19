@@ -39,7 +39,7 @@ function Enum(name, values) {
     , getName: {value: getName}
     , conformsTo: {value: () => conformsTo(jsmfEnum)}
     })
-  if (values instanceof Array) {
+  if (_.isArray(values)) {
     _.forEach(values, (v, k) => jsmfEnum[v] = k)
   } else {
     _.forEach(values, (v, k) => jsmfEnum[k] = v)

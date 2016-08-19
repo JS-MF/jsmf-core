@@ -50,7 +50,7 @@ function Model(name, referenceModel, modellingElements, transitive) {
   this.elemByClassId = new Map()
   this.classes = {}
   if (modellingElements !== undefined) {
-    modellingElements = modellingElements instanceof Array ?  modellingElements : [modellingElements]
+    modellingElements = _.isArray(modellingElements) ?  modellingElements : [modellingElements]
     if (transitive) {
       modellingElements = crawlElements(modellingElements)
     }
@@ -65,7 +65,7 @@ function modelExport(m) {
 }
 
 Model.prototype.addModellingElement = function(es) {
-  es = es instanceof Array ? es : [es]
+  es = _.isArray(es) ? es : [es]
   _.forEach(es, e => {
     if (!isJSMFElement(e)) {throw new TypeError(`can't Add ${e} to model ${this}`)}
     addToClass(this, e)

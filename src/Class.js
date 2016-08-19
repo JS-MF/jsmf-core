@@ -194,7 +194,7 @@ function populateClassFunction(cls) {
 }
 
 function setSuperType(s) {
-  const ss = s instanceof Array ? s : [s]
+  const ss = _.isArray(s) ? s : [s]
   this.superClasses = _.uniq(this.superClasses.concat(ss))
 }
 
@@ -262,7 +262,7 @@ function createSetAttribute(o, name, desc) {
 }
 
 function hasClass(x, type) {
-  const types = type instanceof Array ? type : [type]
+  const types = _.isArray(type) ? type : [type]
   return _.some(x.conformsTo().getInheritanceChain(), c => _.includes(types, c))
 }
 
@@ -271,7 +271,7 @@ function createReference(o, name, desc) {
   Object.defineProperty(o, name,
     { get: () => o.__jsmf__.references[name]
     , set: xs => {
-      xs = xs instanceof Array ? xs : [xs]
+      xs = _.isArray(xs) ? xs : [xs]
       const invalid = _.filter(xs, x => {
         const type = conformsTo(x)
         return type === undefined
@@ -300,7 +300,7 @@ function createReference(o, name, desc) {
 function createAddReference(o, name, desc) {
   Object.defineProperty(o, addName(name),
     { value: function(xs, associated) {
-      xs = xs instanceof Array ? xs : [xs]
+      xs = _.isArray(xs) ? xs : [xs]
       const associationMap = o.__jsmf__.associated
       const backup = associationMap[name]
       o.__jsmf__.references[name] = o[name].concat(xs)
@@ -329,7 +329,7 @@ function createAddReference(o, name, desc) {
 function createRemoveReference(o, name) {
   Object.defineProperty(o, removeName(name),
     { value: xs => {
-      xs = xs instanceof Array ? xs : [xs]
+      xs = _.isArray(xs) ? xs : [xs]
       const associationMap = o.__jsmf__.associated
       associationMap[name] = _.differenceWith(associationMap[name], xs, (x,y) => x.elem === y)
       o.__jsmf__.references[name] = _.difference(o.__jsmf__.references[name], xs)

@@ -1,3 +1,6 @@
+'use srtict'
+const _ = require('lodash')
+
 /**
  * @license
  * ©2015-2016 Luxembourg Institute of Science and Technology All Rights Reserved
@@ -20,18 +23,54 @@
  * @author A. Vagner
  */
 
-const _ = require('lodash')
-
+/** Reference Cardinality
+ */
 function Cardinality(min, max) {
+  /** The minimal cardinality, will be consider as 0 if undefined
+   */
   this.min = min
+  /** The maxmial cardinality, if udefined, there is no max (*)
+   */
   this.max = max
 }
 
+/** A Shortcut for 0..1 cardinality
+ */
 Cardinality.optional = new Cardinality(0,1)
+
+/** A Shortcut for 1..1 cardinality
+ */
 Cardinality.one = new Cardinality(1,1)
+
+/** A Shortcut for 0..* cardinality
+ */
 Cardinality.any = new Cardinality(0)
+
+/** A Shortcut for * cardinality
+ */
 Cardinality.some = new Cardinality(1)
 
+/** Build a Cardinality from a value.
+ * If the value is a positive number v, the result will be 0..v
+ * If it's any other value, we'll try to get the min and max properties
+ * and use respectively 0 and undefined if they are not set.
+ *
+ * @example
+ * // returns {min: 0, max: 4}
+ * Cardinality.check(4)
+ *
+ * @example
+ * // returns {min: 2, max: 4}
+ * Cardinality.check({min: 2, max: 4})
+ *
+ * @example
+ * // returns {min: 2, max: undefined}
+ * Cardinality.check({min: 2, foo: 4})
+ *
+ * @example
+ * // returns {min: 0, max: undefined}
+ * Cardinality.check(undefined)
+ */
 Cardinality.check = function(v) {
   return (_.isNumber(v) && v >= 0)
     ? {min: 0, max: v}

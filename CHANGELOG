@@ -1,3 +1,6 @@
+0.10.0:
+    - We can "refresh" jsmf elements
+      (synchronize the elements with the current version of the class)
 0.9.2:
     - Fix issue for setter of camel case references
     - Fix issue when we crawl Classes with JSMFAny references

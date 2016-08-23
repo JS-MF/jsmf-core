@@ -1,3 +1,8 @@
+'use strict'
+
+const _ = require('lodash')
+    , uuid = require('uuid')
+
 /**
  * @license
  * ©2015-2016 Luxembourg Institute of Science and Technology All Rights Reserved
@@ -20,19 +25,25 @@
  * @author A. Vagner
  */
 
-'use strict'
-
-const _ = require('lodash')
-    , uuid = require('uuid')
-
+/** Provides the conformsTo relationship of any jsmfElement
+ * @param o - A jsmf Object (usually Class, Enum, Model, or ClassInstance)
+ */
 function conformsTo(o) {
   return _.get(o, ['__jsmf__', 'conformsTo'])
 }
 
+/** Returns the jsmfId of any jsmfElement
+ * @param o - A jsmf Object (usually Class, Enum, Model, or ClassInstance)
+ */
 function jsmfId(o) {
   return _.get(o, ['__jsmf__', 'uuid'])
 }
 
+/** Check if an object is a JSMFElement
+ * By construction a JSMFElement has a jsmfID,
+ * returns a value on {@link conformsTo}
+ * this value has a getInheritanceChain method.
+ */
 function isJSMFElement(o) {
   const implement = conformsTo(o)
   return implement

@@ -44,6 +44,7 @@ module.exports =
     , Any: _.constant(true)
     }
 
+/** Transform a native JS type in a JSMF type */
 module.exports.normalizeType = function normalizeType(t) {
   switch (t) {
   case Number: return module.exports.Number

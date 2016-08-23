@@ -47,36 +47,46 @@ let conformsTo, generateId
  * - oppositeCardinality: the cardinality of the opposite reference
  * - associated: the type of the associated data.
  *
+ * @constructor
  * @param {string} name - Name of the class
  * @param {Class[]} superClasses - The superclasses of the current class
  * @param {Object} attributes - the attributes of the class.
  * @param {Object} attributes - the references of the class.
- * @constructor
+ *
+ * @property {string} __name the name of the class
+ * @property {Class[]} superClasses - the superclasses of this JSMF class
+ * @property {Object[]} attributes - the attributes of the class
+ * @property {Object[]} references - the references of the class
+ * @returns {Class~ClassInstance}
  */
 function Class(name, superClasses, attributes, references, flexible) {
-  function jsmfElement(attr) {
+  /** The generic class instances Class
+   * @constructor
+   * @param {Object} attr The initial values of the instance
+   */
+  function ClassInstance(attr) {
     Object.defineProperties(this,
-      { __jsmf__: {value: elementMeta(jsmfElement)}
+      { __jsmf__: {value: elementMeta(ClassInstance)}
       })
-    createAttributes(this, jsmfElement)
-    createReferences(this, jsmfElement)
+    createAttributes(this, ClassInstance)
+    createReferences(this, ClassInstance)
     _.forEach(attr, (v,k) => {this[k] = v})
   }
-  Object.defineProperties(jsmfElement.prototype, {
+  Object.defineProperties(ClassInstance.prototype, {
     conformsTo: {value: function () { return conformsTo(this) }, enumerable: false},
     getAssociated : {value: getAssociated, enumerable: false}
   })
   superClasses = superClasses || []
   superClasses = _.isArray(superClasses) ? superClasses : [superClasses]
-  Object.assign(jsmfElement, {__name: name, superClasses, attributes: {}, references: {}})
-  jsmfElement.errorCallback = flexible
+  Object.assign(ClassInstance, {__name: name, superClasses, attributes: {}, references: {}})
+  ClassInstance.errorCallback = flexible
     ? onError.silent
     : onError.throw
-  Object.defineProperty(jsmfElement, '__jsmf__', {value: classMeta()})
-  populateClassFunction(jsmfElement)
-  if (attributes !== undefined) { jsmfElement.addAttributes(attributes)}
-  if (references !== undefined) { jsmfElement.addReferences(references)}
-  return jsmfElement
+  Object.defineProperty(ClassInstance, '__jsmf__', {value: classMeta()})
+  populateClassFunction(ClassInstance)
+  if (attributes !== undefined) { ClassInstance.addAttributes(attributes)}
+  if (references !== undefined) { ClassInstance.addReferences(references)}
+  return ClassInstance
 }
 
 Class.__name = 'Class'
@@ -88,13 +98,22 @@ Class.newInstance = (name, superClasses, attributes, references) => new Class(na
  */
 const isJSMFClass = o => conformsTo(o) === Class
 
-
+/**
+ * Returns the InheritanceChain of this class
+ * @method
+ * @memberof Class~ClassInstance
+ */
 function getInheritanceChain() {
   return _(this.superClasses)
     .reverse()
     .reduce((acc, v) => v.getInheritanceChain().concat(acc), [this])
 }
 
+/**
+ * Returns the own and inherited references of this class
+ * @method
+ * @memberof Class~ClassInstance
+ */
 function getAllReferences() {
   return _.reduce(
     this.getInheritanceChain(),
@@ -102,6 +121,11 @@ function getAllReferences() {
     {})
 }
 
+/**
+ * Returns the own and inherited attributes of this class
+ * @method
+ * @memberof Class~ClassInstance
+ */
 function getAllAttributes() {
   return _.reduce(
     this.getInheritanceChain(),
@@ -109,7 +133,12 @@ function getAllAttributes() {
     {})
 }
 
-
+/**
+ * Returns the associated data of a reference or of all the references of an object
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {string} name - The name of the reference to explore if undefined, all the references are returned
+ */
 function getAssociated(name) {
   const path = ['__jsmf__', 'associated']
   if (name !== undefined) {
@@ -118,8 +147,18 @@ function getAssociated(name) {
   return _.get(this, path)
 }
 
-function addReferences(descriptors) {
-  _.forEach(descriptors, (desc, k) =>
+/**
+ * Add several references to the Class
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {Object} descriptor - The definition of the attributes,
+ *                              the keys are the names of the attribute to create.
+ *                              The values contains the description of the attribute.
+ *                              See {@link Class~ClassInstance#addAttribute} parameters name
+ *                              for the supported property name.
+ */
+function addReferences(descriptor) {
+  _.forEach(descriptor, (desc, k) =>
     this.addReference(
       k,
       desc.target || desc.type,
@@ -132,6 +171,24 @@ function addReferences(descriptors) {
     )
 }
 
+/**
+ * Add a reference to the Class
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {string} name - The reference name
+ * @param {Class} target - The target class. Note that {@link Class} and {@link Model}
+ *                         can be targeted as well, even if they are not formally
+ *                         instances of {@link Class}.
+ *  @param {Cardinality} sourceCardinality - The cardinality of the reference
+ *  @param {string} opposite - The name of the ooposite reference if any,
+ *                             it can be an existing or a new reference name.
+ *  @param {Cardinality} oppositeCardinality - The cardinality of the opposite reference,
+ *                                             not used if opposite is not set.
+ *  @param {Class} associated - The type of the associated data linked to this reference
+ *  @param {Function} errorCallback - Defines what to do when wrong types are assigned
+ *  @param {Function} oppositeErrorCallback - Defines what to do when wrong types are
+ *                                            assigned to the opposite reference
+ */
 function addReference(name, target, sourceCardinality, opposite, oppositeCardinality, associated, errorCallback, oppositeErrorCallback) {
   this.references[name] = { type: target || Type.JSMFAny
                           , cardinality: Cardinality.check(sourceCardinality)
@@ -158,6 +215,13 @@ function addReference(name, target, sourceCardinality, opposite, oppositeCardina
   this.references[name].errorCallback = errorCallback || this.errorCallback
 }
 
+/**
+ * Remove a reference from a class
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {string} name - The name of the reference to remove
+ * @param {boolean} opposite - true if the opposite reference should be removed as well
+ */
 function removeReference(name, opposite) {
   const ref = this.references[name]
   _.unset(this.references, name)
@@ -174,7 +238,10 @@ function populateClassFunction(cls) {
   Object.defineProperties(cls,
     { getInheritanceChain: {value: getInheritanceChain}
     , newInstance: {value: init => new cls(init)}
-    , conformsTo: {value: () => conformsTo(cls)}
+    , /** Returns the superClasses of a Class
+        * @name Class~ClassInstance#conformsTo
+        */
+      conformsTo: {value: () => conformsTo(cls)}
     , getAllReferences: {value: getAllReferences}
     , addReference: {value: addReference}
     , removeReference: {value: removeReference}
@@ -189,15 +256,34 @@ function populateClassFunction(cls) {
     , setAttributes: {value: addAttributes}
     , setSuperType: {value: setSuperType}
     , setSuperClass: {value: setSuperType}
+    , setSuperClasses: {value: setSuperType}
     , setFlexible: {value: setFlexible}
     })
 }
 
+/** Change superClasses of this class.
+ *
+ * @method
+ * @memberof Class~ClassInstance
+ * @param s - Either a {@link Class} or an array of {@link Class}
+ */
 function setSuperType(s) {
   const ss = _.isArray(s) ? s : [s]
   this.superClasses = _.uniq(this.superClasses.concat(ss))
 }
 
+/** Add an attribute to a class.
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {string} name - The name of the attribute
+ * @param {Function} type - In jsmf an attribute Type is a function that returns true if the
+ *                          value is a member of this type, false otherwise. Some predefined
+ *                          types are available in the class {@link Type}.
+ *                          Users can also use builtin JavaScript types, that are replaced
+ *                          on the fly by the corresponding validation function
+ * @param {boolean} mandatory - If set to true, the attribute can't be set to undefined.
+ * @param {Function} errorCallback - defines what to do if an invalid value is set to this attribute.
+ */
 function addAttribute(name, type, mandatory, errorCallback) {
   this.attributes[name] =
     { type: Type.normalizeType(type)
@@ -206,10 +292,23 @@ function addAttribute(name, type, mandatory, errorCallback) {
     }
 }
 
+/** Remove an attribute to a class
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {string} name - The name of the attribute
+ */
 function removeAttribute(name) {
   _.unset(this.attributes, name)
 }
 
+/** Add several attributes
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {Object} attrs - The attributes to add. The keys are te attribute name,
+ *                         the values are the attributes descriptors.
+ *                         See {@link Class~ClassInstance#RemoveAttribute} for
+ *                         the supported properties.
+ */
 function addAttributes(attrs) {
   _.forEach(attrs, (v, k) => {
     if (v.type !== undefined) {
@@ -261,6 +360,11 @@ function createSetAttribute(o, name, desc) {
     })
 }
 
+/** Check whether a class (or some classes) are in the inheritance chain of a given class
+ * @function
+ * @param {Class} x - The class to test
+ * @param type - Either a {@link Class} or an array of classes tha should be in the class x.
+ */
 function hasClass(x, type) {
   const types = _.isArray(type) ? type : [type]
   return _.some(x.conformsTo().getInheritanceChain(), c => _.includes(types, c))
@@ -343,6 +447,13 @@ function classMeta() {
   return {uuid: generateId(), conformsTo: Class}
 }
 
+/** Decide whether whether or not type will becheck for attributes and
+ * references of a whole class.
+ * @method
+ * @memberof Class~ClassInstance
+ * @param {boolean} b - If true, type is not checked on assignement,
+ *                      if false wrong assignement type riase an error.
+ */
 function setFlexible(b) {
   this.errorCallback = b ? onError.silent : onError.throw
   _.forEach(this.references, r => r.errorCallback = this.errorCallback)
@@ -388,11 +499,22 @@ function refreshElement(o) {
   return o
 }
 
-
+/** Predefined function for type error handling.
+ * It can be used in {@link Class~ClassInstance#addReference} and {@link Class~ClassInstance#addAttribute}
+ */
 const onError =
-  { 'throw': function(o,n,x) {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
-  , 'log': function(o,n,x) {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
-  , 'silent': function() {}
+  { /** Raise an error on type error
+      * @member
+      */
+    'throw': function(o,n,x) {throw new TypeError(`Invalid assignment: ${x} for property ${n} of object ${o}`)}
+  , /** Assign and log the error on type error
+      * @member
+      */
+    'log': function(o,n,x) {console.log(`assignment: ${x} for property ${n} of object ${o}`)}
+  , /** Assign anyway.
+      * @member
+      */
+    'silent': function() {}
   }
 
 module.exports = { Class, isJSMFClass, hasClass, onError, refreshElement }

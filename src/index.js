@@ -66,6 +66,8 @@ function dryModel(c) {
   return _.assign({__jsmf: {uuid: Common.jsmfId(c)}}, _.pick(c, ['__name', 'referenceModel', 'modellingElements']))
 }
 
+/** Check structural equality for JSMF elements.
+ */
 function jsmfIsEqual(obj, other) {
   return _.isEqualWith(obj, other, customizer)
 }

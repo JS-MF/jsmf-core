@@ -41,13 +41,34 @@ let isJSMFClass, refreshElement
 
 const isJSMFEnum = require('./Enum').isJSMFEnum
 
+/** A Model is basically a set of elements
+ * @constructor
+ * @param {string} name - The model name
+ * @param {Model} referenceModel - The reference model (indicative and used for conformance)
+ * @param {Class~ClassInstance[]} modellingElements - Either an element or an array of elements that
+ *                                                    should be included in the model
+ * @param {boolean} transitive - If false, only the elements in modellingElements will be in the model,
+ *                               otherwise all theelements that can be reach from modellingElements
+ *                               references are included in the model
+ */
 function Model(name, referenceModel, modellingElements, transitive) {
+  /** @memberOf Model
+   * @member {string} name - The name of the model
+   */
   this.__name = name
   _.set(this, ['__jsmf__','conformsTo'], Model)
   _.set(this, ['__jsmf__','uuid'], generateId())
+  /** @memberof Model
+   * @member {Model} referenceModel - The referenceModel (an empty object if undefined)
+   */
   this.referenceModel = referenceModel || {}
+  /** @memberof Model
+   * @member {Object} modellingElements - The objects of the model, classified by their class name
+   */
   this.modellingElements = {}
-  this.elemByClassId = new Map()
+  /** @memberOf Model
+   * @member {Object} classes - classes and enums of the model, classified by their name
+   */
   this.classes = {}
   if (modellingElements !== undefined) {
     modellingElements = _.isArray(modellingElements) ?  modellingElements : [modellingElements]
@@ -58,12 +79,17 @@ function Model(name, referenceModel, modellingElements, transitive) {
   }
 }
 
+/** A helper to export a model and all its classes in a npm module.
+ */
 function modelExport(m) {
   const result = _.mapValues(m.classes, _.head)
   result[m.__name] = m
   return result
 }
 
+/** Add a modelling element to a model
+ * @param es - Either an element or an array of elements.
+ */
 Model.prototype.addModellingElement = function(es) {
   es = _.isArray(es) ? es : [es]
   _.forEach(es, e => {
@@ -89,20 +115,43 @@ function addToModellingElements(m, e) {
   m.modellingElements[key] = current
 }
 
+/** @deprecated
+ * @method
+ */
 Model.prototype.Filter = function(cls) {
   return this.modellingElements[_.get(cls, '__name')]
 }
 
+/** Model inheritanceChain
+ * @method
+ */
 Model.getInheritanceChain = _.constant([Model])
 Model.prototype.conformsTo = function() { return conformsTo(this) }
+
+/** @deprecated
+ * @method
+ * @see Model#addModellingElement
+ */
 Model.prototype.setModellingElements = Model.prototype.addModellingElement
+
+/** @see Model#addModellingElement
+ *  @method
+ */
 Model.prototype.add = Model.prototype.addModellingElement
+
+/** Set the reference model of a model
+ */
 Model.prototype.setReferenceModel = function(rm) {this.referenceModel = rm}
 
+/** List all the elements of a Model
+ */
 Model.prototype.elements = function() {
   return _(this.modellingElements).values().flatten().value()
 }
 
+/**
+ * Remove from the elements of a model all the elements that are not explicitely in the model
+ */
 Model.prototype.crop = function() {
   const elements = this.elements()
   _.forEach(elements, e => {
@@ -159,6 +208,9 @@ function dispatch(elems) {
       {})
 }
 
+/** Update all the elements of a model: If the class they are conformsTo has changed,
+ * update the elements to reflect these changes.
+ */
 function refreshModel(o) {
   if (!(o instanceof Model)) {throw new TypeError('Model expected')}
   _.forEach(o.elements(), refreshElement)

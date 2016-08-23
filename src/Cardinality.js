@@ -24,6 +24,9 @@ const _ = require('lodash')
  */
 
 /** Reference Cardinality
+ * @constructor
+ * @param {number} min - The lower bound of a cardinality
+ * @param {number} max - The upper bound of a cardinality
  */
 function Cardinality(min, max) {
   /** The minimal cardinality, will be consider as 0 if undefined

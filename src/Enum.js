@@ -31,30 +31,46 @@ let conformsTo, generateId
   generateId = Common.generateId
 }).call()
 
+/** Define an Enum
+ * @constructor
+ * @param {string} name - The name of the created Enum
+ * @param values - Either an Array of string or an Object.
+ *                 If an Array is provided, the indexes are used as Enum values.
+ */
 function Enum(name, values) {
-  function jsmfEnum(x) {return _.includes(jsmfEnum, x)}
-  Object.defineProperties(jsmfEnum,
+  /** The generic Enum instance
+   * @constructor
+   */
+  function EnumInstance(x) {return _.includes(EnumInstance, x)}
+  Object.defineProperties(EnumInstance,
     { __jsmf__: {value: {uuid: generateId(), conformsTo: Enum}}
     , __name: {value: name}
     , getName: {value: getName}
-    , conformsTo: {value: () => conformsTo(jsmfEnum)}
+    , conformsTo: {value: () => conformsTo(EnumInstance)}
     })
   if (_.isArray(values)) {
-    _.forEach(values, (v, k) => jsmfEnum[v] = k)
+    _.forEach(values, (v, k) => EnumInstance[v] = k)
   } else {
-    _.forEach(values, (v, k) => jsmfEnum[k] = v)
+    _.forEach(values, (v, k) => EnumInstance[k] = v)
   }
-  return jsmfEnum
+  return EnumInstance
 }
 
+/** The Enum name */
 Enum.__name = 'Enum'
+
 
 Enum.getInheritanceChain = () => [Enum]
 
+/** Given a value, find the associated key in an Enum, if any.
+ * @memberof Enum~EnumInstance
+ */
 function getName(o) {
   return _.findKey(this, v => v === o)
 }
 
+/** Check if an object is an Enum
+ */
 function isJSMFEnum(o) {
   return conformsTo(o) === Enum
 }

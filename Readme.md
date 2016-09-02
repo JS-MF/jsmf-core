@@ -6,7 +6,7 @@ A part of the JSMF project dedicated to model definition.
 
 ## Install
 
-Thanks to npm: `npm install git+ssh://git@git.list.lu:model/jsmf.git#0.9.1`
+Thanks to npm: `npm install jsmf-core`
 
 ## License information
 

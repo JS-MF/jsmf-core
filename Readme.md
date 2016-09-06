@@ -21,13 +21,12 @@ const JSMF = require('jsmf-core')
 ### Creating a metamodel element (i.e., Class)
 
 Here we created a Class "Family" and a "lastname" attribute.
-This way of creating metamodel elements is inspired by the EMF syntax.
+This syntax is inspired by the EMF one.
 ```javascript
 const Family = Class.newInstance('Family')
 Family.addAttribute('lastname' , String )
 ```
-
-Alternatively you can use a more compact syntax (here defining a Person Class).
+Alternatively you can use a more compact syntax (here defining a Person Class) using javascript objects.
 ```javascript
 const Person = Class.newInstance ('Person', [] ,
 { firstname : String , age : JSMF.Positive })
@@ -35,23 +34,25 @@ const Person = Class.newInstance ('Person', [] ,
 Now we have the Class "Person" and "Family" let's create a reference between those two Classes.
 
 ```javascript
-Family.addReference ('members', Person , JSMF.Cardinality.Some )
+Family.addReference ('members', Person , JSMF.Cardinality.Some ) 
 ```
 
 ### Creating a model element conforms to a metamodel element.
+
+
 ```javascript
 const john = new Person ()
 john . firstname = ’ John ’
 john . age = 46
 ```
 
-Alternatively you can also use a compact syntax
+Alternatively you can also use a compact syntax:
 ```javascript
 const kennedy = Family . newInstance ({ name : ’ Kennedy ’ ,
 members : [ john ]})
 ```
 
-You can find examples and online test with Tonic on JSMF github website (https://js-mf.github.io/#portfolio)
+You can find examples, discover the other components and test it online with Tonic on JSMF github website (https://js-mf.github.io/#portfolio)
 
 ## License information
 

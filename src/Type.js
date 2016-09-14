@@ -35,6 +35,7 @@ module.exports =
     , Date: _.isDate
     , Array: _.isArray
     , Object: _.isObject
+    , Function: _.isFunction
     , Range: function Range(min, max) {
       const self = x => x >= min && x <= max
       Object.assign(self, {typeName: 'Range', min, max})

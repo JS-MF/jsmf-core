@@ -26,6 +26,19 @@ describe('JSMFAny', function() {
 
 })
 
+describe('Function', done => {
+
+  it('accept functions', done => {
+    JSMF.Function(x => x + 1).should.be.true()
+    done()
+  })
+
+  it('refuses objects', done => {
+    JSMF.Function({x :42}).should.be.false()
+    done()
+  })
+})
+
 describe('Range', done => {
 
   it('accepts values in range', done => {
@@ -49,6 +62,16 @@ describe('Range', done => {
   it('rejects out of scope value', done => {
     const r = new JSMF.Range(0,4)
     r(5).should.be.false()
+    done()
+  })
+
+})
+
+describe('normalizeType', done => {
+
+  it ('transform Number to JSMF.Number', done => {
+    JSMF.normalizeType(Number).should.be.eql(JSMF.Number)
+    JSMF.normalizeType(String)(2).should.be.false()
     done()
   })
 

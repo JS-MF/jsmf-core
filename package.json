@@ -25,12 +25,12 @@
   "author": "Jean-Sebastien Sottet <jean-sebastien.sottet@list.lu> (http://www.list.lu/)",
   "license": "MIT",
   "dependencies": {
-    "lodash": "^4.1.0",
-    "uuid": "^2.0.1"
+    "lodash": "^4.15.0",
+    "uuid": "^2.0.3"
   },
   "devDependencies": {
-    "should": "^7.1.1",
-    "mocha": "^2.4.5",
+    "should": "^11.1.0",
+    "mocha": "^3.0.2",
     "assert": "^1.3.0"
   }
 }

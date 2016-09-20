@@ -8,7 +8,7 @@ let Class, Model, Enum
   Model = JSMF.Model
   Class = JSMF.Class
   Enum = JSMF.Enum
-}).call();
+}).call()
 
 
 const Signal = new Enum('Signal', ['LOW', 'HIGH'])

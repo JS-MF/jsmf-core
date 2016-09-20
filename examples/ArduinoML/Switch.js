@@ -25,8 +25,8 @@ on.transition = tOn
 const aOff = AML.Action.newInstance({value: AML.Signal.LOW, actuator: led})
 const tOff = AML.Transition.newInstance({value: AML.Signal.HIGH, sensor: button})
 const off = AML.State.newInstance({name: 'off'})
-on.action = aOff
-on.transition = tOff
+off.action = aOff
+off.transition = tOff
 
 
 /*
@@ -41,15 +41,15 @@ tOff.next = on
  */
 
 const switchApp = AML.App.newInstance({
-    name: 'Switch!',
-    bricks: [button, led],
-    states: [on, off],
-    initial: off
+  name: 'Switch!',
+  bricks: [button, led],
+  states: [on, off],
+  initial: off
 })
 
 const Switch = new Model('Switch', AML.ArduinoML, switchApp, true)
 
 module.exports = {
-    Switch: Switch,
-    switchApp: switchApp
+  Switch: Switch,
+  switchApp: switchApp
 }

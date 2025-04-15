@@ -76,6 +76,17 @@ describe('Model', function() {
       M.modellingElements.should.have.property('B', [b])
       done()
     })
+    
+     it ('adds class to te model and set the model flexible, should propagate to all classes', function(done) {
+      const A = new Class('A')
+      const B = new Class('B')
+      const M = new Model('Bar', {}, [A, B])
+      M.modellingElements.should.have.property('Class', [A, B])
+      M.setFlexible(true)
+      M.classes['A'][0].isFlexible().should.equal(true)
+      M.classes['B'][0].isFlexible().should.equal(true)
+      done()
+    })
 
   })
 

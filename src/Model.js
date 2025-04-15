@@ -1,6 +1,6 @@
 /**
  * @license
- * ©2015-2016 Luxembourg Institute of Science and Technology All Rights Reserved
+ * ©2015-2025 Luxembourg Institute of Science and Technology All Rights Reserved
  * JavaScript Modelling Framework (JSMF)
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -147,6 +147,15 @@ Model.prototype.setReferenceModel = function(rm) {this.referenceModel = rm}
  */
 Model.prototype.elements = function() {
   return _(this.modellingElements).values().flatten().value()
+}
+
+/**
+* @ flexible : Boolean, true if all containing classes should be set flexible, false otherwise
+* Warning should also turn some assignation options on/off 
+*/
+Model.prototype.setFlexible = function(flexible) {
+    var metaclasses = this.modellingElements.Class
+    metaclasses.forEach(x => { x.setFlexible(flexible)})
 }
 
 /**

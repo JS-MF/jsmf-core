@@ -21,7 +21,7 @@ describe('Class', function() {
             done()
         })
 
-        it('is a JSMF eleemnt', function(done) {
+        it('is a JSMF element', function(done) {
             var Instance = new Class('Instance')
             JSMF.isJSMFElement(Instance).should.be.true()
             done()
@@ -412,6 +412,23 @@ describe('Class', function() {
           const references = C.getAllReferences()
           references.should.have.property('foo')
           references.foo.type.should.eql(B)
+          done()
+        })
+    })
+    
+    describe('Class semanticReference', function() {
+    	 it('create the  semantic references (URI) building the Class', done => {
+          var Bus = new Class('Bus',[],[],[],false,'https://schema.org/BusOrCoach')
+          Bus.__semanticReference.should.equal('https://schema.org/BusOrCoach')
+          Bus.getSemanticReference().should.equal('https://schema.org/BusOrCoach')
+          done()
+        })
+        
+        it('set the semantic reference (URI) by setSemanticReference function and retrives it', done => {
+          var Bus = new Class('Bus')
+          Bus.getSemanticReference.should.be.empty
+          Bus.setSemanticReference('https://schema.org/BusOrCoach')
+          Bus.getSemanticReference().should.equal('https://schema.org/BusOrCoach')
           done()
         })
     })

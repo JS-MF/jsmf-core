@@ -1,6 +1,6 @@
 /**
  * @license
- * ©2015-2016 Luxembourg Institute of Science and Technology All Rights Reserved
+ * ©2015-2025 Luxembourg Institute of Science and Technology All Rights Reserved
  * JavaScript Modelling Framework (JSMF)
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
@@ -52,6 +52,9 @@ let conformsTo, generateId
  * @param {Class[]} superClasses - The superclasses of the current class
  * @param {Object} attributes - the attributes of the class.
  * @param {Object} attributes - the references of the class.
+ * @Param {Boolean} flexible - set if the class is flexible (i.e., shutting down error handling) or not.
+ * @Param {string} semanticReference  - the uri corresponding the ontological element that the class
+ is refering to.
  *
  * @property {string} __name the name of the class
  * @property {Class[]} superClasses - the superclasses of this JSMF class
@@ -59,7 +62,8 @@ let conformsTo, generateId
  * @property {Object[]} references - the references of the class
  * @returns {Class~ClassInstance}
  */
-function Class(name, superClasses, attributes, references, flexible) {
+function Class(name, superClasses, attributes, references, flexible, semanticReference) {
+   this.semanticReference = semanticReference
   /** The generic class instances Class
    * @constructor
    * @param {Object} attr The initial values of the instance
@@ -72,13 +76,14 @@ function Class(name, superClasses, attributes, references, flexible) {
     createReferences(this, ClassInstance)
     _.forEach(attr, (v,k) => {this[k] = v})
   }
+  
   Object.defineProperties(ClassInstance.prototype, {
     conformsTo: {value: function () { return conformsTo(this) }, enumerable: false},
     getAssociated : {value: getAssociated, enumerable: false}
   })
   superClasses = superClasses || []
   superClasses = _.isArray(superClasses) ? superClasses : [superClasses]
-  Object.assign(ClassInstance, {__name: name, superClasses, attributes: {}, references: {}})
+  Object.assign(ClassInstance, {__name: name, superClasses, attributes: {}, references: {}, __semanticReference : semanticReference})
   ClassInstance.errorCallback = flexible
     ? onError.silent
     : onError.throw
@@ -97,6 +102,12 @@ Class.newInstance = (name, superClasses, attributes, references) => new Class(na
 /** Return true if the given object is a JSMF Class.
  */
 const isJSMFClass = o => conformsTo(o) === Class
+
+
+
+function classMeta() {
+  return {uuid: generateId(), conformsTo: Class}
+}
 
 /**
  * Returns the InheritanceChain of this class
@@ -133,6 +144,23 @@ function getAllAttributes() {
     {})
 }
 
+
+/**
+* Returns the semantic reference of a given class
+*
+*/
+function getSemanticReference() {
+	return this.__semanticReference
+}
+
+
+function setSemanticReference(semanticReference) {
+        this.__semanticReference = semanticReference
+}
+
+function isFlexible() {
+	return this.errorCallback==onError.silent
+}
 /**
  * Returns the associated data of a reference or of all the references of an object
  * @method
@@ -258,6 +286,9 @@ function populateClassFunction(cls) {
     , setSuperClass: {value: setSuperType}
     , setSuperClasses: {value: setSuperType}
     , setFlexible: {value: setFlexible}
+    , isFlexible : {value: isFlexible}
+    , setSemanticReference : {value : setSemanticReference}
+    , getSemanticReference : {value:getSemanticReference}
     })
 }
 
@@ -318,7 +349,6 @@ function addAttributes(attrs) {
     }
   })
 }
-
 
 function createAttributes(e, cls) {
   _.forEach(cls.getAllAttributes(), (desc, name) => {
@@ -443,11 +473,9 @@ function createRemoveReference(o, name) {
 }
 
 
-function classMeta() {
-  return {uuid: generateId(), conformsTo: Class}
-}
 
-/** Decide whether whether or not type will becheck for attributes and
+
+/** Decide whether whether or not type will be check for attributes and
  * references of a whole class.
  * @method
  * @memberof Class~ClassInstance

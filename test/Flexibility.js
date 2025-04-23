@@ -34,6 +34,15 @@ describe('Class Flexibility', () => {
         test.should.throw()
         done()
       })
+      
+      it('throws error on invalid attribute assignation', done => {
+      const A = new Class('A', [], {val: Number})
+      const a = new A({val: 12})
+      a.val.should.be.equal(12)
+      function test() {a.bval = 42}
+      test.should.throw()
+      done()
+    })
 
     })
 
@@ -46,6 +55,7 @@ describe('Class Flexibility', () => {
         x.x.should.be.equal('toto')
         done()
       })
+
 
       it('assigns on invalid reference value', done => {
         const A = new Class('A', [])
@@ -101,6 +111,17 @@ describe('Class Flexibility', () => {
         done()
       })
 
+      it('throws on invalid attribute assignation', done => {
+        const A = new Class('A', [], {x:Number},[],true)
+        const a = new A();
+        a.z = 12
+        a.z.should.equal(12) 
+        A.setFlexible(false)
+        let test = function() { a.b='toto'}
+        test.should.throw()
+        done()
+      })
+
       it('throws on invalid reference value', done => {
         const A = new Class('A', [])
         const B = new Class('B', [])
@@ -124,6 +145,17 @@ describe('Class Flexibility', () => {
         done()
       })
 
+      it('assigns on invalid attribute value', done => {
+        const A = new Class('A', [], {x: {type: Number, errorCallback: JSMF.onError.throw}})
+        const a = new A({x: 12})
+        function test() {a.bval = 42}
+        test.should.throw()
+        A.setFlexible(true)
+        a.bval=42
+        a.bval.should.be.equal(42)
+        done()
+      })
+
       it('assigns on invalid reference value', done => {
         const A = new Class('A', [])
         const B = new Class('B', [])
@@ -140,12 +172,11 @@ describe('Class Flexibility', () => {
     })
   })
 
-  describe('chanching the metamodel', () => {
+  describe('changing the metamodel', () => {
 
     it('ensures that removed property is not acessible via getAllAttributes', done => {
       const A = new Class('A', [], {a: Number})
       const a = new A({a: 12})
-      a.b = 'foo'
       delete A.attributes['a']
       _.pick(a, _.keys(A.getAllAttributes())).should.eql({})
       done()
@@ -154,6 +185,7 @@ describe('Class Flexibility', () => {
     it('ensures that added property is acessible via getAllAttributes', done => {
       const A = new Class('A', [], {a: Number})
       const a = new A({a: 12})
+      A.setFlexible(true);
       a.b = 'foo'
       _.pick(a, _.keys(A.getAllAttributes())).should.eql({a: 12})
       delete A.addAttribute('b', String)

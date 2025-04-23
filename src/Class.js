@@ -75,6 +75,7 @@ function Class(name, superClasses, attributes, references, flexible, semanticRef
     createAttributes(this, ClassInstance)
     createReferences(this, ClassInstance)
     _.forEach(attr, (v,k) => {this[k] = v})
+   return new Proxy(this , assignationHandler)
   }
   
   Object.defineProperties(ClassInstance.prototype, {
@@ -159,6 +160,7 @@ function setSemanticReference(semanticReference) {
 }
 
 function isFlexible() {
+        console.log(this.errorCallback);
 	return this.errorCallback==onError.silent
 }
 /**
@@ -266,10 +268,7 @@ function populateClassFunction(cls) {
   Object.defineProperties(cls,
     { getInheritanceChain: {value: getInheritanceChain}
     , newInstance: {value: init => new cls(init)}
-    , /** Returns the superClasses of a Class
-        * @name Class~ClassInstance#conformsTo
-        */
-      conformsTo: {value: () => conformsTo(cls)}
+    , conformsTo: {value: () => conformsTo(cls)}
     , getAllReferences: {value: getAllReferences}
     , addReference: {value: addReference}
     , removeReference: {value: removeReference}
@@ -526,6 +525,20 @@ function refreshElement(o) {
   })
   return o
 }
+
+/** Predefined function for assignation error handling
+ * It is used in initialisation of classInstance
+ */
+const assignationHandler = {
+  set(target, property, value) {
+  const flex = target.conformsTo().errorCallback==onError.silent
+    if (!(property in target) && !flex ) { 
+      throw new Error(`Cannot add property ${property}` );
+    }
+    target[property] = value;
+    return true;
+  }
+};
 
 /** Predefined function for type error handling.
  * It can be used in {@link Class~ClassInstance#addReference} and {@link Class~ClassInstance#addAttribute}

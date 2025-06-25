@@ -416,9 +416,26 @@ describe('Class', function() {
         })
     })
     
+    describe('Class description', function() {
+    	 it('create the  description when building the Class', done => {
+          var Bus = new Class('Bus',[],[],[],false,'A standard city bus','https://schema.org/BusOrCoach')
+          Bus.__description.should.equal('A standard city bus')
+          Bus.getDescription().should.equal('A standard city bus')
+          done()
+        })
+        
+        it('set the class description by setDescription function and retrives it', done => {
+          var Bus = new Class('Bus')
+          Bus.getSemanticReference.should.be.empty
+          Bus.setDescription('Standard city bus representation')
+          Bus.getDescription().should.equal('Standard city bus representation')
+          done()
+        })
+    })
+    
     describe('Class semanticReference', function() {
     	 it('create the  semantic references (URI) building the Class', done => {
-          var Bus = new Class('Bus',[],[],[],false,'https://schema.org/BusOrCoach')
+          var Bus = new Class('Bus',[],[],[],false,'','https://schema.org/BusOrCoach')
           Bus.__semanticReference.should.equal('https://schema.org/BusOrCoach')
           Bus.getSemanticReference().should.equal('https://schema.org/BusOrCoach')
           done()

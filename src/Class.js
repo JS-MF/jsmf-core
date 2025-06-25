@@ -52,9 +52,9 @@ let conformsTo, generateId
  * @param {Class[]} superClasses - The superclasses of the current class
  * @param {Object} attributes - the attributes of the class.
  * @param {Object} attributes - the references of the class.
- * @Param {Boolean} flexible - set if the class is flexible (i.e., shutting down error handling) or not.
- * @Param {string} semanticReference  - the uri corresponding the ontological element that the class
- is refering to.
+ * @param {Boolean} flexible - set if the class is flexible (i.e., shutting down error handling) or not.
+ * @param {string} semanticReference  - the uri corresponding the ontological element that the class is refering to.
+  @param {string} description  - description of the class providing more guidance to understand its meaning.
  *
  * @property {string} __name the name of the class
  * @property {Class[]} superClasses - the superclasses of this JSMF class
@@ -62,8 +62,9 @@ let conformsTo, generateId
  * @property {Object[]} references - the references of the class
  * @returns {Class~ClassInstance}
  */
-function Class(name, superClasses, attributes, references, flexible, semanticReference) {
+function Class(name, superClasses, attributes, references, flexible, description, semanticReference) {
    this.semanticReference = semanticReference
+   this.description = description
   /** The generic class instances Class
    * @constructor
    * @param {Object} attr The initial values of the instance
@@ -84,7 +85,7 @@ function Class(name, superClasses, attributes, references, flexible, semanticRef
   })
   superClasses = superClasses || []
   superClasses = _.isArray(superClasses) ? superClasses : [superClasses]
-  Object.assign(ClassInstance, {__name: name, superClasses, attributes: {}, references: {}, __semanticReference : semanticReference})
+  Object.assign(ClassInstance, {__name: name, superClasses, attributes: {}, references: {}, __description : description, __semanticReference : semanticReference})
   ClassInstance.errorCallback = flexible
     ? onError.silent
     : onError.throw
@@ -154,13 +155,24 @@ function getSemanticReference() {
 	return this.__semanticReference
 }
 
+/**
+* Returns the description of a given class
+*
+*/
+function getDescription() {
+	return this.__description
+}
 
 function setSemanticReference(semanticReference) {
         this.__semanticReference = semanticReference
 }
 
+
+function setDescription(description) {
+        this.__description = description
+}
+
 function isFlexible() {
-        console.log(this.errorCallback);
 	return this.errorCallback==onError.silent
 }
 /**
@@ -287,7 +299,9 @@ function populateClassFunction(cls) {
     , setFlexible: {value: setFlexible}
     , isFlexible : {value: isFlexible}
     , setSemanticReference : {value : setSemanticReference}
-    , getSemanticReference : {value:getSemanticReference}
+    , getSemanticReference : {value : getSemanticReference}
+    , setDescription : {value : setDescription}
+    , getDescription : {value : getDescription}
     })
 }
 
